@@ -1,0 +1,12 @@
+{
+    "id": "{199B3F83-D949-981E-56E3-15C1CBB67938}",
+    "name": "Bring",
+    "author": "Michael Tröger",
+    "url": "https://github.com/Nall-chan/bring-symcon",
+    "compatibility": {
+        "version": "7.1"
+    },
+    "version": "1.0",
+    "build": 100,
+    "date": 0
+}

@@ -1,0 +1,18 @@
+{
+    "id": "{44D63530-0E14-8B8F-3E1A-A79728240524}",
+    "name": "Bring List",
+    "type": 3,
+    "vendor": "",
+    "aliases": [
+        "Bring! List"
+    ],
+    "parentRequirements": [
+        "{63EFC3AC-198A-DE2F-1770-F98D7E61A5D0}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{F7682E26-E142-6D58-40B5-F53EB1B1A7CC}"
+    ],
+    "prefix": "BRING",
+    "url": "https://github.com/Nall-chan/bring-symcon"
+}

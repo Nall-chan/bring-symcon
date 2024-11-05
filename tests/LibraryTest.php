@@ -11,17 +11,17 @@ class LibraryTest extends TestCaseSymconValidation
         $this->validateLibrary(__DIR__ . '/..');
     }
 
-    public function testValidateDiscovery(): void
+    public function testValidateAccount(): void
     {
-        $this->validateModule(__DIR__ . '/../Bring Gateway');
+        $this->validateModule(__DIR__ . '/../Bring Account');
     }
 
-    public function testValidateIO(): void
+    public function testValidateConfigurator(): void
     {
         $this->validateModule(__DIR__ . '/../Bring Configurator');
     }
 
-    public function testValidateConfigurator(): void
+    public function testValidateList(): void
     {
         $this->validateModule(__DIR__ . '/../Bring List');
     }

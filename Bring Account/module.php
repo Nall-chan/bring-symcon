@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-eval('declare(strict_types=1);namespace BringList {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/DebugHelper.php') . '}');
+eval('declare(strict_types=1);namespace BringAccount {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/DebugHelper.php') . '}');
 require_once dirname(__DIR__) . '/libs/BringApi.php';
 
 /**
@@ -12,7 +12,7 @@ require_once dirname(__DIR__) . '/libs/BringApi.php';
  */
 class BringAccount extends IPSModuleStrict
 {
-    use \BringList\DebugHelper;
+    use \BringAccount\DebugHelper;
 
     private static $http_error =
     [

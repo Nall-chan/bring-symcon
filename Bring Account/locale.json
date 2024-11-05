@@ -1,0 +1,17 @@
+{
+    "translations": {
+        "de": {
+            "Bring Account": "Bring Konto",
+            "Bring! Account": "Bring! Konto",
+            "Abort": "Abbruch",
+            "Please enter credentials!": "Bitte Zugangsdaten eingeben!",
+            "e-Mail Address": "e-Mail Adresse",
+            "Password": "Passwort",
+            "Login error": "Fehler beim Login",
+            "Logged in user: ": "Angemeldeter Benutzer: ",
+            "Instance is inactive": "Instanz ist inaktiv",
+            "Instance is in error state": "Instanz ist in Fehlerzustand",
+            "This module is free for non-commercial use,\r\nDonations in support of the author are accepted here:": "Dieses Modul ist für die nicht kommerzielle Nutzung kostenlos,\r\nSchenkungen als Unterstützung für den Autor werden hier akzeptiert:"
+        }
+    }
+}

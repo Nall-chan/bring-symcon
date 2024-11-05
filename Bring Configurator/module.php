@@ -5,7 +5,6 @@ declare(strict_types=1);
 eval('declare(strict_types=1);namespace BringConfigurator {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/DebugHelper.php') . '}');
 require_once dirname(__DIR__) . '/libs/BringApi.php';
 
-
 /**
  * BringConfigurator
  * @method bool SendDebug(string $Message, mixed $Data, int $Format)
@@ -23,7 +22,7 @@ class BringConfigurator extends IPSModuleStrict
     {
         //Never delete this line!
         parent::Create();
-        $this->ConnectParent(\Bring\GUID::Gateway);
+        $this->ConnectParent(\Bring\GUID::Account);
     }
 
     /**
@@ -60,13 +59,27 @@ class BringConfigurator extends IPSModuleStrict
             return json_encode($Form);
         }
         if (!$this->HasActiveParent() || (IPS_GetInstance($this->InstanceID)['ConnectionID'] == 0)) {
+            $items = [];
+            if (IPS_GetInstance($this->InstanceID)['ConnectionID']) {
+                $items[] = [
+                    'type'    => 'OpenObjectButton',
+                    'caption' => 'Open Account Instance',
+                    'objectID'=> IPS_GetInstance($this->InstanceID)['ConnectionID']
+                ];
+            }
             $Form['actions'][] = [
                 'type'  => 'PopupAlert',
                 'popup' => [
-                    'items' => [[
-                        'type'    => 'Label',
-                        'caption' => 'Instance has no active parent.'
-                    ]]
+                    'items' => array_merge(
+                        [
+
+                            [
+                                'type'    => 'Label',
+                                'caption' => 'Instance has no active parent.'
+                            ]],
+                        $items
+                    )
+
                 ]
             ];
             $this->SendDebug('FORM', json_encode($Form), 0);
@@ -79,6 +92,35 @@ class BringConfigurator extends IPSModuleStrict
         return json_encode($Form);
     }
 
+    /**
+     * FilterInstances
+     *
+     * @param  int $InstanceID
+     * @return bool
+     */
+    protected function FilterInstances(int $InstanceID): bool
+    {
+        return IPS_GetInstance($InstanceID)['ConnectionID'] == IPS_GetInstance($this->InstanceID)['ConnectionID'];
+    }
+
+    /**
+     * GetConfigParam
+     *
+     * @param  mixed $item1
+     * @param  int $InstanceID
+     * @param  string $ConfigParam
+     * @return void
+     */
+    protected function GetConfigParam(mixed &$item1, int $InstanceID, string $ConfigParam): void
+    {
+        $item1 = IPS_GetProperty($InstanceID, $ConfigParam);
+    }
+
+    /**
+     * LoadLists
+     *
+     * @return array
+     */
     private function LoadLists(): array
     {
         $Lists = $this->GetLists();
@@ -110,15 +152,14 @@ class BringConfigurator extends IPSModuleStrict
         return $Values;
     }
 
+    /**
+     * GetLists
+     *
+     * @return array
+     */
     private function GetLists(): array
     {
-        $JSON = json_encode([
-            \Bring\FlowToParent::DataID     => \Bring\GUID::SendToIO,
-            \Bring\FlowToParent::Method     => \Bring\Api\RequestMethod::GET,
-            \Bring\FlowToParent::Url       => 'bringusers/%%%UserUuid%%%/lists',
-            \Bring\FlowToParent::Payload    => []
-        ]);
-        $Result = $this->SendDataToParent($JSON);
+        $Result = @$this->SendDataToParent(\Bring\Api::GetLists());
         if (!$Result) {
             return [];
         }
@@ -128,30 +169,6 @@ class BringConfigurator extends IPSModuleStrict
         }
         $this->SendDebug(__FUNCTION__, $Result, 0);
         return $Result['lists'];
-    }
-
-    /**
-     * FilterInstances
-     *
-     * @param  int $InstanceID
-     * @return bool
-     */
-    protected function FilterInstances(int $InstanceID): bool
-    {
-        return IPS_GetInstance($InstanceID)['ConnectionID'] == IPS_GetInstance($this->InstanceID)['ConnectionID'];
-    }
-
-    /**
-     * GetConfigParam
-     *
-     * @param  mixed $item1
-     * @param  int $InstanceID
-     * @param  string $ConfigParam
-     * @return void
-     */
-    protected function GetConfigParam(mixed &$item1, int $InstanceID, string $ConfigParam): void
-    {
-        $item1 = IPS_GetProperty($InstanceID, $ConfigParam);
     }
 
     /**

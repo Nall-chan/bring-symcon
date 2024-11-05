@@ -1,20 +1,17 @@
 {
     "id": "{C6D2590B-D9DB-113F-5EF1-9323E7B9DBDA}",
-    "name": "Bring Gateway",
-    "type": 2,
+    "name": "Bring Account",
+    "type": 1,
     "vendor": "",
     "aliases": [
-        "Bring! Gateway"
+        "Bring! Account"
     ],
-    "parentRequirements": [
-        "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}"
-    ],
+    "parentRequirements": [],
     "childRequirements": [
         "{F7682E26-E142-6D58-40B5-F53EB1B1A7CC}"
     ],
     "implemented": [
-        "{63EFC3AC-198A-DE2F-1770-F98D7E61A5D0}",
-        "{018EF6B5-AB94-40C6-AA53-46943E824ACF}"
+        "{63EFC3AC-198A-DE2F-1770-F98D7E61A5D0}"
     ],
     "prefix": "BRING",
     "url": "https://github.com/Nall-chan/bring-symcon"

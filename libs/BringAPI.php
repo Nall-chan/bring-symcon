@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Bring{
     class Api
     {
-        public const BringRestURL = 'https://api.getbring.com/rest/';
-        public const UserUuid = 'UserUuid';
+        public const BringRestURL = 'https://api.getbring.com/rest/v2/';
         public const Login = 'Login';
         public static $CURL_error_codes = [
             0  => 'UNKNOWN ERROR',
@@ -89,20 +88,247 @@ namespace Bring{
             88 => 'CURLE_CHUNK_FAILED'
         ];
 
+        /**
+         * GetLists
+         *
+         * @return string
+         */
+        public static function GetLists(): string
+        {
+            return json_encode([
+                \Bring\FlowToParent::DataID     => \Bring\GUID::SendToIO,
+                \Bring\FlowToParent::Method     => \Bring\Api\RequestMethod::GET,
+                \Bring\FlowToParent::Url        => 'bringusers/%%%UserUuid%%%/lists',
+                \Bring\FlowToParent::Payload    => []
+            ]);
+        }
+
+        /**
+         * LoadList
+         *
+         * @param  string $ListUuid
+         * @return string
+         */
+        public static function GetList(string $ListUuid): string
+        {
+            return json_encode([
+                \Bring\FlowToParent::DataID     => \Bring\GUID::SendToIO,
+                \Bring\FlowToParent::Method     => \Bring\Api\RequestMethod::GET,
+                \Bring\FlowToParent::Url        => 'bringlists/' . $ListUuid,
+                \Bring\FlowToParent::Payload    => []
+            ]);
+        }
+
+        /**
+         * GetListDetail
+         *
+         * @param  string $ListUuid
+         * @return string
+         */
+        public static function GetListDetail(string $ListUuid): string
+        {
+            return json_encode([
+                \Bring\FlowToParent::DataID     => \Bring\GUID::SendToIO,
+                \Bring\FlowToParent::Method     => \Bring\Api\RequestMethod::GET,
+                \Bring\FlowToParent::Url        => 'bringlists/' . $ListUuid . '/details',
+                \Bring\FlowToParent::Payload    => []
+            ]);
+        }
+
+        /**
+         * SendNotification
+         *
+         * @param  string $ListUuid
+         * @param  string $NotificationType
+         * @param  string $ItemName
+         * @return string
+         */
+        public static function SendNotification(string $ListUuid, string $NotificationType, string $ItemName = ''): string
+        {
+            return json_encode([
+                \Bring\FlowToParent::DataID     => \Bring\GUID::SendToIO,
+                \Bring\FlowToParent::Method     => \Bring\Api\RequestMethod::POST,
+                \Bring\FlowToParent::Url        => 'bringnotifications/lists/' . $ListUuid,
+                \Bring\FlowToParent::Payload    => [
+                    json_encode([
+                        'arguments'                     => [$ItemName],
+                        'listNotificationType'          => $NotificationType,
+                        'senderPublicUserUuid'          => '%%%PublicUserUuid%%%'])
+                ]
+            ]);
+        }
+
+        /**
+         * AddItem
+         *
+         * @param  string $ListUuid
+         * @param  string $ItemName
+         * @param  string $Specification
+         * @return string
+         */
+        public static function AddItem(string $ListUuid, string $ItemName, string $Specification): string
+        {
+            return json_encode([
+                \Bring\FlowToParent::DataID     => \Bring\GUID::SendToIO,
+                \Bring\FlowToParent::Method     => \Bring\Api\RequestMethod::PUT,
+                \Bring\FlowToParent::Url        => 'bringlists/' . $ListUuid,
+                \Bring\FlowToParent::Payload    => [
+                    'purchase'     => $ItemName,
+                    'recently'     => '',
+                    'specification'=> $Specification,
+                    'remove'       => '',
+                    'sender'       => '%%%PublicUserUuid%%%'
+                ]
+            ]);
+        }
+
+        /**
+         * ChangeMultipleItems
+         *
+         * @param  string $ListUuid
+         * @param  array $Items
+         * @return string
+         */
+        public static function ChangeMultipleItems(string $ListUuid, array $Items): string
+        {
+            return json_encode([
+                \Bring\FlowToParent::DataID     => \Bring\GUID::SendToIO,
+                \Bring\FlowToParent::Method     => \Bring\Api\RequestMethod::PUT,
+                \Bring\FlowToParent::Url        => 'bringlists/' . $ListUuid . '/items',
+                \Bring\FlowToParent::Payload    => [
+                    json_encode([
+                        /*
+                    "accuracy": "0.0",
+                    "altitude" => "0.0",
+                    "latitude"=> "0.0",
+                    "longitude"=> "0.0",
+                         */
+                        'changes'      => $Items,
+                        'sender'       => '%%%PublicUserUuid%%%'
+                    ])
+                ]
+            ]);
+        }
+
+        /**
+         * RemoveItem
+         *
+         * @param  string $ListUuid
+         * @param  string $ItemName
+         * @return string
+         */
+        public static function RemoveItem(string $ListUuid, string $ItemName): string
+        {
+            return json_encode([
+                \Bring\FlowToParent::DataID     => \Bring\GUID::SendToIO,
+                \Bring\FlowToParent::Method     => \Bring\Api\RequestMethod::PUT,
+                \Bring\FlowToParent::Url        => 'bringlists/' . $ListUuid,
+                \Bring\FlowToParent::Payload    => [
+                    'purchase'     => '',
+                    'recently'     => '',
+                    'specification'=> '',
+                    'remove'       => $ItemName,
+                    'sender'       => '%%%PublicUserUuid%%%'
+                ]
+            ]);
+        }
+
+        /**
+         * GetAllUsersFromList
+         *
+         * @param  string $ListUuid
+         * @return string
+         */
+        public static function GetAllUsersFromList(string $ListUuid): string
+        {
+            return json_encode([
+                \Bring\FlowToParent::DataID     => \Bring\GUID::SendToIO,
+                \Bring\FlowToParent::Method     => \Bring\Api\RequestMethod::GET,
+                \Bring\FlowToParent::Url        => 'bringlists/' . $ListUuid . '/users',
+                \Bring\FlowToParent::Payload    => []
+            ]);
+        }
+
+        /**
+         * GetHeader
+         *
+         * @return array  Header
+         */
+        public static function GetApiHeader(): array
+        {
+            return [
+                'X-BRING-API-KEY: cof4Nc6D8saplXjE3h3HXqHH8m7VU2i1Gs0g85Sp',
+                'X-BRING-CLIENT: webApp',
+                'X-BRING-COUNTRY: de',
+            ];
+        }
+
     }
+    /**
+     * GUID
+     */
     class GUID
     {
         public const WSClient = '{D68FD31F-0E90-7019-F16C-1949BD3079EF}';
         public const ReceiveFromWS = '{018EF6B5-AB94-40C6-AA53-46943E824ACF}';
         public const SendToWS = '{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}';
-        public const Gateway = '{C6D2590B-D9DB-113F-5EF1-9323E7B9DBDA}';
+        public const Account = '{C6D2590B-D9DB-113F-5EF1-9323E7B9DBDA}';
         public const List = '{44D63530-0E14-8B8F-3E1A-A79728240524}';
         public const SendToIO = '{63EFC3AC-198A-DE2F-1770-F98D7E61A5D0}';
     }
+    /**
+     * Property
+     */
     class Property
     {
         public const ListUuid = 'listUuid';
+        public const RefreshInterval = 'RefreshInterval';
+        public const EnableTextboxVariable = 'EnableTextboxVariable';
+        public const EnableRefreshIntegerVariable = 'EnableRefreshIntegerVariable';
+        public const EnableNotificationIntegerVariable = 'EnableNotificationIntegerVariable';
+        public const EnableNotificationStringVariable = 'EnableNotificationStringVariable';
+        public const EnableTileDisplay = 'EnableTileDisplay';
+        public const AutomaticallySendNotification = 'AutomaticallySendNotification';
+
     }
+    /**
+     * Attribute
+     */
+    class Attribute
+    {
+        public const uuid = 'uuid';
+        public const Name = 'name';
+        public const EMail = 'email';
+        public const Password = 'password';
+        public const publicUuid = 'publicUuid';
+        public const AccessToken = 'access_token';
+        public const RefreshToken = 'refresh_token';
+        public const AccessTokenExpiresIn = 'expires_in';
+        public const UserImage = 'UserImage';
+        public const AllLists = 'AllLists';
+        public const ListTheme = 'ListTheme';
+    }
+    /**
+     * Timer
+     */
+    class Timer
+    {
+        public const RefreshToken = 'RefreshToken';
+        public const RefreshList = 'RefreshList';
+    }
+    /**
+     * Variable
+     */
+    class Variable
+    {
+        public const TextBox = 'TextBox';
+        public const Reload = 'Reload';
+        public const Notify = 'Notify';
+        public const UrgentItem = 'UrgentItem';
+    }
+    /**
+     * FlowToParent
+     */
     class FlowToParent
     {
         public const DataID = 'DataID';
@@ -110,44 +336,53 @@ namespace Bring{
         public const Method = 'Method';
         public const Payload = 'Payload';
     }
+    /**
+     * FlowToWebSocket
+     */
+    class FlowToWebSocket
+    {
+        public const DataID = 'DataID';
+        public const Buffer = 'Buffer';
+    }
 }
 
 namespace Bring\Api{
 
+    /**
+     * RequestMethod
+     */
     class RequestMethod
     {
         public const GET = 'GET';
         public const POST = 'POST';
         public const PUT = 'PUT';
     }
+    /**
+     * NotificationTypes
+     */
+    class NotificationTypes
+    {
+        public const CHANGED_LIST = 'CHANGED_LIST';
+        public const GOING_SHOPPING = 'GOING_SHOPPING';
+        public const SHOPPING_DONE = 'SHOPPING_DONE';
+        public const URGENT_MESSAGE = 'URGENT_MESSAGE';
+    }
+
+    /**
+     * BringItemOperation
+     */
+    class BringItemOperation
+    {
+        public const ADD = 'TO_PURCHASE';
+        public const COMPLETE = 'TO_RECENTLY';
+        public const REMOVE = 'REMOVE';
+        public const ATTRIBUTE_UPDATE = 'ATTRIBUTE_UPDATE';
+    }
 }
 
 namespace Bring{
     class notused
     {
-        /**
-         *   Save an item to your current shopping list
-         *
-         *   @param string $itemName       The name of the item you want to send to the bring server
-         *   @param string $specification  The litte description under the name of the item
-         *   @return should return an empty string and $answerHttpStatus should contain 204. If not -> error
-         */
-        public function saveItem($itemName, $specification)
-        {
-            return $this->request(self::PUT_REQUEST, 'bringlists/' . $this->bringListUUID, 'purchase=' . $itemName . '&recently=&specification=' . $specification . '&remove=&sender=null');
-        }
-
-        /**
-         *   remove an item from your current shopping list
-         *
-         *   @param string $itemName       Name of the item you want to delete from you shopping list
-         *   @return should return an empty string and $answerHttpStatus should contain 204. If not -> error
-         */
-        public function removeItem($itemName)
-        {
-            return $this->request(self::PUT_REQUEST, 'bringlists/' . $this->bringListUUID, 'purchase=&recently=&specification=&remove=' . $itemName . '&sender=null');
-        }
-
         /**
          *   Search for an item
          *

@@ -1,8 +1,24 @@
 {
     "translations": {
         "de": {
-            "Translation 1": "Übersetzung 1",
-            "Translation 2": "Übersetzung 2"
+            "List": "Liste",
+            "Refresh Interval": "Aktualisierungsintervall",
+            "Create Textbox Variable": "Textbox-Variable erstellen",
+            "Create Button for Refresh": "Schaltfläche zum Aktualisieren erstellen",
+            "Create Button to send Notification": "Schaltfläche zum senden von Benachrichtigungen erstellen",
+            "Create Textbox to send an Item Notification": "Textfeld zum senden einer Artikelbenachrichtigung erstellen",
+            "Enable Tile Visualisation": "Kachelvisualisierung aktivieren",
+            "Send automaticlly Notification when Item is added": "Automatische Benachrichtigung senden wenn Artikel hinzugefügt wird",
+            "Reload": "Neu laden",
+            "Shopping done": "Einkauf erledigt",
+            "Go shopping": "Gehe Einkaufen",
+            "List changed": "Liste geändert",
+            "Purchase": "Kaufen",
+            "Reload List": "Liste neu laden",
+            "Send Notification": "Sende Benachrichtigung",
+            "Send Urgent Item Notification": "Senden dringende Artikelbenachrichtigung",
+            "Error on change the list": "Fehler beim Ändern der Liste",
+            "This module is free for non-commercial use,\r\nDonations in support of the author are accepted here:": "Dieses Modul ist für die nicht kommerzielle Nutzung kostenlos,\r\nSchenkungen als Unterstützung für den Autor werden hier akzeptiert:"
         }
     }
 }

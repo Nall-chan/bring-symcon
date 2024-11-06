@@ -7,7 +7,7 @@ eval('declare(strict_types=1);namespace BringList {?>' . file_get_contents(dirna
 eval('declare(strict_types=1);namespace BringList {?>' . file_get_contents(__DIR__ . '/../libs/helper/ParentIOHelper.php') . '}');
 eval('declare(strict_types=1);namespace BringList {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/AttributeArrayHelper.php') . '}');
 eval('declare(strict_types=1);namespace BringList {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/VariableProfileHelper.php') . '}');
-require_once dirname(__DIR__) . '/libs/BringApi.php';
+require_once dirname(__DIR__) . '/libs/BringAPI.php';
 
 /**
  * BringList

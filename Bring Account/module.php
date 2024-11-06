@@ -15,14 +15,14 @@ class BringAccount extends IPSModuleStrict
     use \BringAccount\DebugHelper;
 
     private static $http_error =
-    [
-        400 => 'Bad Request',
-        401 => 'Unauthorized',
-        403 => 'Forbidden',
-        404 => 'Not Found',
-        405 => 'Method Not Allowed',
-        500 => 'Server error'
-    ];
+        [
+            400 => 'Bad Request',
+            401 => 'Unauthorized',
+            403 => 'Forbidden',
+            404 => 'Not Found',
+            405 => 'Method Not Allowed',
+            500 => 'Server error'
+        ];
 
     /**
      * Create

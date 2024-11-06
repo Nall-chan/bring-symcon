@@ -36,19 +36,19 @@
         {
             "type": "CheckBox",
             "name": "EnableTileDisplay",
-            "caption": "Enable Tile Visualisation"
+            "caption": "Enable Tile Visualization"
         },
         {
             "type": "Select",
             "name": "AutomaticallySendNotification",
-            "caption": "Send automaticlly Notification when Item is added",
+            "caption": "Send automatically Notification when Item is added",
             "options": [
                 {
                     "caption": "Never",
                     "value": -1
                 },
                 {
-                    "caption": "Immidently",
+                    "caption": "Immediately",
                     "value": 0
                 },
                 {

@@ -35,12 +35,18 @@ Einbinden von `Bring!` Einkauflisten in IPS.
    **Bei kommerzieller Nutzung (z.B. als Errichter oder Integrator) wenden Sie sich bitte an den Autor.**  
 ![Module-Store](imgs/install.png) 
 
+ Nach der Installation über den Store, wird abgefragt ob ein Konfigurator von diesem Modul automatisch angelegt werden soll.
+
+ Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
+
+
+
 ## 3. Enthaltende Module
 
 - __Bring Account__ ([Dokumentation](Bring%20Account))  
 	IO-Modul für einen Bring! Account  
 
-- __Bring Configurator__ ([Dokumentation](Bring%20Configurator))  
+- __Bring Konfigurator__ ([Dokumentation](Bring%20Configurator))  
 	Konfigurator um alle Listen eines Accounts in Symcon anzulegen.  
 
 - __Bring List__ ([Dokumentation](Bring%20List))  

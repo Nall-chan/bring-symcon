@@ -315,6 +315,7 @@ namespace Bring{
     {
         public const RefreshToken = 'RefreshToken';
         public const RefreshList = 'RefreshList';
+        public const SendListChangeNotification = 'SendListChangeNotification';
     }
     /**
      * Variable

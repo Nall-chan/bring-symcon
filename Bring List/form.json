@@ -1,17 +1,24 @@
 {
     "elements": [
         {
-            "type": "Select",
-            "name": "listUuid",
-            "caption": "List",
-            "options": []
-        },
-        {
-            "name": "RefreshInterval",
-            "type": "NumberSpinner",
-            "caption": "Refresh Interval",
-            "suffix": "seconds",
-            "minimum": 0
+            "type": "RowLayout",
+            "items": [
+                {
+                    "type": "Select",
+                    "name": "listUuid",
+                    "caption": "List",
+                    "options": [],
+                    "width": "250px"
+                },
+                {
+                    "name": "RefreshInterval",
+                    "type": "NumberSpinner",
+                    "caption": "Refresh Interval",
+                    "suffix": "seconds",
+                    "minimum": 0,
+                    "width": "250px"
+                }
+            ]
         },
         {
             "type": "CheckBox",
@@ -24,46 +31,54 @@
             "caption": "Create Button for Refresh"
         },
         {
-            "type": "CheckBox",
-            "name": "EnableNotificationIntegerVariable",
-            "caption": "Create Button to send Notification"
-        },
-        {
-            "type": "CheckBox",
-            "name": "EnableNotificationStringVariable",
-            "caption": "Create Textbox to send an Item Notification"
+            "type": "ExpansionPanel",
+            "caption": "Bring! Notifications",
+            "expanded": true,
+            "items": [
+                {
+                    "type": "CheckBox",
+                    "name": "EnableNotificationIntegerVariable",
+                    "caption": "Create Button to send Notification"
+                },
+                {
+                    "type": "CheckBox",
+                    "name": "EnableNotificationStringVariable",
+                    "caption": "Create Textbox to send an Item Notification"
+                },
+                {
+                    "type": "Select",
+                    "name": "AutomaticallySendNotification",
+                    "caption": "Send automatically Notification",
+                    "options": [
+                        {
+                            "caption": "Never",
+                            "value": 0
+                        },
+                        {
+                            "caption": "Immediately",
+                            "value": 1
+                        },
+                        {
+                            "caption": "Delayed (15 Secounds)",
+                            "value": 15
+                        },
+                        {
+                            "caption": "Delayed (30 Secounds)",
+                            "value": 30
+                        },
+                        {
+                            "caption": "Delayed (1 Minute)",
+                            "value": 60
+                        }
+                    ]
+                }
+            ]
         },
         {
             "type": "CheckBox",
             "name": "EnableTileDisplay",
-            "caption": "Enable Tile Visualization"
-        },
-        {
-            "type": "Select",
-            "name": "AutomaticallySendNotification",
-            "caption": "Send automatically Notification when Item is added",
-            "options": [
-                {
-                    "caption": "Never",
-                    "value": -1
-                },
-                {
-                    "caption": "Immediately",
-                    "value": 0
-                },
-                {
-                    "caption": "Delayed (15 Secounds)",
-                    "value": 15
-                },
-                {
-                    "caption": "Delayed (30 Secounds)",
-                    "value": 30
-                },
-                {
-                    "caption": "Delayed (1 Minute)",
-                    "value": 60
-                }
-            ]
+            "caption": "Enable Tile Visualization",
+            "visible": false
         }
     ],
     "actions": [

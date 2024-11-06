@@ -51,7 +51,7 @@ class BringList extends IPSModuleStrict
 
         $this->RegisterPropertyString(\Bring\Property::ListUuid, '');
         $this->RegisterPropertyInteger(\Bring\Property::RefreshInterval, 0);
-        $this->RegisterPropertyInteger(\Bring\Property::AutomaticallySendNotification, -1);
+        $this->RegisterPropertyInteger(\Bring\Property::AutomaticallySendNotification, 0);
         $this->RegisterPropertyBoolean(\Bring\Property::EnableNotificationIntegerVariable, true);
         $this->RegisterPropertyBoolean(\Bring\Property::EnableNotificationStringVariable, true);
         $this->RegisterPropertyBoolean(\Bring\Property::EnableRefreshIntegerVariable, true);
@@ -59,6 +59,7 @@ class BringList extends IPSModuleStrict
         $this->RegisterPropertyBoolean(\Bring\Property::EnableTileDisplay, true);
 
         $this->RegisterTimer(\Bring\Timer::RefreshList, 0, 'BRING_UpdateList(' . $this->InstanceID . ');');
+        $this->RegisterTimer(\Bring\Timer::SendListChangeNotification, 0, 'IPS_RequestAction(' . $this->InstanceID . ',"' . \Bring\Timer::SendListChangeNotification . '",true);');
     }
 
     /**
@@ -76,6 +77,24 @@ class BringList extends IPSModuleStrict
         parent::Destroy();
     }
 
+    /**
+     * Migrate
+     *
+     * @param  string $JSONData
+     * @return string
+     */
+    /*public function Migrate(string $JSONData): string
+    {
+        $Data = json_decode($JSONData);
+        if ($Data->configuration->{\Bring\Property::AutomaticallySendNotification} == -1)
+        {
+            $Data->configuration->{\Bring\Property::AutomaticallySendNotification} =0;
+            $this->SendDebug('Migrate', json_encode($Data), 0);
+            $this->LogMessage('Migrated settings:' . json_encode($Data), KL_MESSAGE);
+        }
+        return json_encode($Data);
+    }
+     */
     /**
      * ApplyChanges
      *
@@ -224,9 +243,7 @@ class BringList extends IPSModuleStrict
                 if (count($Items)) {
                     if ($this->ChangeMultipleItems($Items)) {
                         $this->UpdateList();
-                        /**
-                         * @todo timer für senden Item Added Notification setzen.
-                         */
+                        $this->SetTimerInterval(\Bring\Timer::SendListChangeNotification, $this->ReadPropertyInteger(\Bring\Property::AutomaticallySendNotification) * 1000);
                     } else {
                         echo $this->Translate('Error on change the list');
                     }
@@ -240,6 +257,10 @@ class BringList extends IPSModuleStrict
                 break;
             case \Bring\Variable::UrgentItem:
                 $this->SendUrgentItemNotify($Value);
+                break;
+            case \Bring\Timer::SendListChangeNotification:
+                $this->SetTimerInterval(\Bring\Timer::SendListChangeNotification, 0);
+                $this->SendNotify(\Bring\Api\NotificationTypes::CHANGED_LIST);
                 break;
         }
     }
@@ -486,7 +507,7 @@ class BringList extends IPSModuleStrict
                 'value'  => $List[\Bring\Property::ListUuid]
             ];
         }
-        $Form['elements'][0]['options'] = $Values;
+        $Form['elements'][0]['items'][0]['options'] = $Values;
         $this->SendDebug('FORM', json_encode($Form), 0);
         $this->SendDebug('FORM', json_last_error_msg(), 0);
         return json_encode($Form);

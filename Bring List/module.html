@@ -1,0 +1,360 @@
+<head>
+    <style>
+        body {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .bring-item-indicators-container {
+            padding: 1px 0;
+            width: 14px;
+            height: 100%;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            -webkit-box-pack: start;
+            -ms-flex-pack: start;
+            justify-content: flex-start
+        }
+
+        .bring-item-indicators-container-left {
+            -webkit-box-align: end;
+            -ms-flex-align: end;
+            align-items: flex-end
+        }
+
+        .bring-list-item-name {
+            display: block;
+            /*width: 90px;*/
+            min-height: 17px;
+            max-height: 27px;
+            padding-top: 2px;
+            margin: 0 auto;
+            /*font-size: 14px;*/
+            line-height: .95em;
+            overflow: hidden;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            text-overflow: ellipsis;
+            overflow-wrap: break-word
+        }
+
+        .bring-list-search-bar {
+            padding-bottom: 10px;
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+
+        .bring-list-search-bar-input {
+            width: 100%;
+            border: 1px solid;
+            border-radius: 4px;
+            padding: 10px;
+            /*font-size: 18px*/
+        }
+
+        .bring-list-search-bar-input:focus {
+            outline: 0;
+            -webkit-box-shadow: 0 0 5px #37474f;
+            box-shadow: 0 0 5px #37474f;
+            border: 1px solid #4faba2
+        }
+
+        .bring-list-item-container {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+            padding: 0 16px;
+            font-size: 11pt
+        }
+
+        /*  Item block*/
+        bring-list-item {
+            display: block;
+            list-style-type: none;
+            height: 115px;
+            width: 115px;
+            /*98px;*/
+            cursor: pointer
+        }
+
+        .purchase div {
+            background-color: rgb(238, 82, 79);
+        }
+
+        .recently div {
+            background-color: rgb(79, 171, 162);
+        }
+
+        .bring-list-item-content {
+            width: calc(100% - 4px);
+            height: calc(100% - 4px);
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -ms-flex-pack: distribute;
+            justify-content: space-around;
+            margin: 2px;
+            text-align: center;
+            color: #f4f4f4;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale
+        }
+
+        .bring-list-item-upper-part-container {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: horizontal;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            -webkit-box-pack: justify;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            width: 100%;
+            height: 60px;
+            -webkit-box-align: end;
+            -ms-flex-align: end;
+            align-items: flex-end
+        }
+
+        .bring-list-item-image-container {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            height: 60px;
+            width: 65px;
+            min-width: 65px
+        }
+
+        .bring-list-item-image {
+            max-height: 50px;
+            max-width: 65px
+        }
+
+        .bring-list-item-text-container {
+            width: 100%;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            height: 43px;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: end;
+            -ms-flex-pack: end;
+            justify-content: flex-end
+        }
+
+        .bring-list-item-specification-textbox {
+            color: #f4f4f4;
+            border: none;
+            text-align: center;
+            cursor: text;
+            background-color: rgba(0, 0, 0, .0);
+            padding: 0 4px;
+            height: 16px;
+            width: 90px;
+            font-size: 11px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-top: 1px
+        }
+
+        .bring-list-item-specification-textbox:focus {
+            outline: 1
+        }
+
+        .bring-list-item-specification-textbox::-moz-selection {
+            color: #f4f4f4;
+            background-color: rgba(0, 0, 0, .3)
+        }
+
+        .bring-list-item-specification-textbox::selection {
+            color: #f4f4f4;
+            background-color: rgba(0, 0, 0, .3)
+        }
+
+        .bring-expandable-section {
+            font-size: 18px;
+            color: #f4f4f4;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            position: relative;
+            background-color: #37474f;
+            height: 60px;
+            line-height: 60px;
+            margin: 16px 16px 10px 16px;
+            padding-left: 16px;
+            -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, .16), 0 6px 12px rgba(0, 0, 0, .32);
+            box-shadow: 0 0 6px rgba(0, 0, 0, .16), 0 6px 12px rgba(0, 0, 0, .32)
+        }
+    </style>
+    <script>
+        const localArticles = {}
+
+        function handleMessage(message) {
+            const decodedData = JSON.parse(message);
+            for (const data of decodedData) {
+                const ident = data.ident.toLowerCase();
+                const element = document.getElementById(ident)
+                switch (ident) {
+                    case 'purchase':
+                    case 'recently':
+                        const item = document.getElementById(data.item.name);
+                        if (item) {
+                            element.append(item);
+                        } else {
+                            const templ = document.querySelector("#bring-list-item-template")
+                            let clone = templ.content.cloneNode(true);
+                            clone.querySelector("bring-list-item").id = data.item.name;
+                            clone.querySelector(".bring-list-item-image").src = data.item.icon;
+                            clone.querySelector(".bring-list-item-name").textContent = data.item.name;
+                            clone.querySelector(".bring-list-item-specification-textbox").value = data.item.specification;
+                            clone.querySelector('bring-list-item').addEventListener('click', itemBringClick);
+                            clone.querySelector('input').addEventListener('click', noBringClick);
+                            clone.querySelector('input').addEventListener('keyup', editBringSpecification);
+                            element.append(clone);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        function noBringClick() {
+            event.stopPropagation();
+        }
+
+        function editBringSpecification(event) {
+            if (event.key === 'Enter') {
+                const element = event.currentTarget;
+                const data = {
+                    'name': element.parentNode.parentNode.parentNode.id,
+                    'specification': element.value
+                }
+                if (element.parentNode.parentNode.parentNode.parentNode.id == "purchase") {
+                    requestAction('editSpecification', JSON.stringify(data));
+                }
+                if (element.parentNode.parentNode.parentNode.parentNode.id == "recently") {
+                    requestAction('addItem', JSON.stringify(data));
+                }
+                document.activeElement.blur();
+            }
+
+        }
+        function searchItem(event) {
+            const localItems = document.getElementById('localItems');
+            while (localItems.hasChildNodes()) {
+                localItems.removeChild(localItems.firstChild);
+            }
+            const input = document.getElementById('search');
+            const search = input.value.toLowerCase();
+            for (const item of Object.values(localArticles)) {
+                if (item.toLowerCase().includes(search)) {
+                    const att = document.createAttribute("value");
+                    att.value = item;
+                    const option = document.createElement("option");
+                    option.setAttributeNode(att);
+                    localItems.appendChild(option);
+                }
+            }
+        }
+        function itemBringClick(event) {
+            const data = {
+                'name': this.id,
+                'specification': this.querySelector(".bring-list-item-specification-textbox").value
+            }
+            if (this.parentNode.classList.contains("purchase")) {
+                requestAction('purchased', JSON.stringify(data));
+            }
+            if (this.parentNode.classList.contains("recently")) {
+                requestAction('addItem', JSON.stringify(data));
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            //A little delay
+            let typingTimer;
+            let typeInterval = 500;
+            document.querySelector('.bring-list-search-bar-input').addEventListener('keyup', () => {
+                clearTimeout(typingTimer);
+                if (event.key === 'Enter') {
+                    const element = event.currentTarget;
+                    const data = {
+                        'name': element.value,
+                        'specification': ''
+                    }
+                    if (element.value != '') {
+                        requestAction('addItem', JSON.stringify(data));
+                    }
+                    return;
+                }
+                typingTimer = setTimeout(searchItem, typeInterval);
+            });
+            document.getElementById('search').setAttribute('placeholder',translate('What do you want to buy?'));
+        });
+    </script>
+</head>
+
+<body>
+    <div id="container">
+        <template id="bring-list-item-template">
+            <bring-list-item>
+                <div class="bring-list-item-content">
+                    <div class="bring-list-item-upper-part-container">
+                        <div class="bring-item-indicators-container bring-item-indicators-container-left">
+                        </div>
+                        <div class="bring-list-item-image-container">
+                            <img class="bring-list-item-image" src="">
+                        </div>
+                        <div class="bring-item-indicators-container">
+                        </div>
+                    </div>
+                    <div class="bring-list-item-text-container">
+                        <div class="bring-list-item-name"></div>
+                        <input class="bring-list-item-specification-textbox" type="text">
+                    </div>
+                </div>
+            </bring-list-item>
+        </template>
+        <div class="bring-list-search-bar">
+            <input class="bring-list-search-bar-input" type="text" placeholder="What do you want to buy?"
+                list="localItems" id="search">
+            <datalist id="localItems"></datalist>
+        </div>
+        <div class="bring-list-item-container purchase" id="purchase">
+        </div>
+        <bring-expandable-section class="bring-model-section">
+            <div class="bring-expandable-section">Last used</div>
+            <div class="bring-list-item-container recently" id="recently">
+            </div>
+        </bring-expandable-section>
+    </div>
+</body>

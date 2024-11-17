@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 eval('declare(strict_types=1);namespace BringAccount {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/DebugHelper.php') . '}');
+eval('declare(strict_types=1);namespace BringAccount {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/VariableHelper.php') . '}');
 require_once dirname(__DIR__) . '/libs/BringAPI.php';
 
 /**
@@ -13,6 +14,7 @@ require_once dirname(__DIR__) . '/libs/BringAPI.php';
 class BringAccount extends IPSModuleStrict
 {
     use \BringAccount\DebugHelper;
+    use \BringAccount\VariableHelper;
 
     private static $http_error =
         [
@@ -42,6 +44,7 @@ class BringAccount extends IPSModuleStrict
         $this->RegisterAttributeInteger(\Bring\Attribute::AccessTokenExpiresIn, 0);
         $this->RegisterAttributeString(\Bring\Attribute::RefreshToken, '');
         $this->RegisterAttributeString(\Bring\Attribute::UserImage, '');
+        //$this->RegisterAttributeString(\Bring\Attribute::UserLocale, '');
         $this->RegisterTimer(\Bring\Timer::RefreshToken, 0, 'IPS_RequestAction(' . $this->InstanceID . ',"' . \Bring\Timer::RefreshToken . '",true);');
     }
 
@@ -138,13 +141,10 @@ class BringAccount extends IPSModuleStrict
         $this->WriteAttributeString(\Bring\Attribute::uuid, $Result[\Bring\Attribute::uuid]);
         $this->WriteAttributeString(\Bring\Attribute::publicUuid, $Result[\Bring\Attribute::publicUuid]);
         $this->UpdateTokenData($Result);
-        //$this->UpdateFormField('ClearLogin', 'visible', true);
-        //$this->UpdateFormField('Login', 'visible', false);
-        //$this->UpdateFormField('Name', 'caption', $this->Translate('Logged in user: ') . $this->ReadAttributeString(\Bring\Attribute::Name));
-        $this->LoadProfile($Result[\Bring\Attribute::publicUuid]);
+        $this->LoadProfile($Result[\Bring\Attribute::uuid], $Result[\Bring\Attribute::publicUuid]);
         //$this->ConnectToWS();
         $this->ReloadForm();
-        return ''; //'MESSAGE:' . $this->Translate('Login OK');
+        return '';
     }
 
     /**
@@ -192,6 +192,8 @@ class BringAccount extends IPSModuleStrict
      */
     public function ForwardData(string $JSONString): string
     {
+        $Data = json_decode($JSONString, true);
+        $this->SendDebug(__FUNCTION__, $Data, 0);
         switch ($this->GetStatus()) {
             case IS_ACTIVE:
                 break;
@@ -206,13 +208,11 @@ class BringAccount extends IPSModuleStrict
                 restore_error_handler();
                 return serialize(false);
         }
-        $Data = json_decode($JSONString, true);
+
         $Data[\Bring\FlowToParent::Url] = str_replace('%%%UserUuid%%%', $this->ReadAttributeString(\Bring\Attribute::uuid), $Data[\Bring\FlowToParent::Url]);
         foreach ($Data[\Bring\FlowToParent::Payload] as $Key => &$Value) {
-            //if (is_string($Value)){
             $Value = str_replace('%%%UserUuid%%%', $this->ReadAttributeString(\Bring\Attribute::uuid), $Value);
             $Value = str_replace('%%%PublicUserUuid%%%', $this->ReadAttributeString(\Bring\Attribute::publicUuid), $Value);
-            //}
         }
         $Result = $this->DoRequest(
             $Data[\Bring\FlowToParent::Method],
@@ -271,7 +271,7 @@ class BringAccount extends IPSModuleStrict
      * @param  mixed $publicUuid
      * @return void
      */
-    private function LoadProfile($publicUuid): void
+    private function LoadProfile(string $Uuid, string $publicUuid): void
     {
         $Result = $this->DoRequest(
             \Bring\Api\RequestMethod::GET,

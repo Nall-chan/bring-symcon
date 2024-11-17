@@ -4,10 +4,10 @@
             "List": "Liste",
             "Refresh Interval": "Aktualisierungsintervall",
             "seconds": "Sekunden",
-            "Bring! Notifications": "Bring! Benachrichtigungen",
+            "Bring! Notifications": "Bring! Benachrichtigung",
             "Create Textbox Variable": "Textbox-Variable erstellen",
             "Create Button for Refresh": "Schaltfläche zum Aktualisieren erstellen",
-            "Create Button to send Notification": "Schaltfläche zum senden von Benachrichtigungen erstellen",
+            "Create Button to send Notification": "Schaltfläche zum senden von Benachrichtigung erstellen",
             "Create Textbox to send an Item Notification": "Textfeld zum senden einer Artikelbenachrichtigung erstellen",
             "Enable Tile Visualization": "Kachel Visualisierung aktivieren",
             "Send automatically Notification": "Automatische Benachrichtigung senden",
@@ -25,6 +25,8 @@
             "Send Notification": "Sende Benachrichtigung",
             "Send Urgent Item Notification": "Sende dringende Artikelbenachrichtigung",
             "Error on change the list": "Fehler beim Ändern der Liste",
+            "What do you want to buy?": "Was willst du einkaufen?",
+            "Last used": "Zuletzt verwendet",
             "This module is free for non-commercial use,\r\nDonations in support of the author are accepted here:": "Dieses Modul ist für die nicht kommerzielle Nutzung kostenlos,\r\nSchenkungen als Unterstützung für den Autor werden hier akzeptiert:"
         }
     }

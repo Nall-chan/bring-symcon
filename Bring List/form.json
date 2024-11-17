@@ -77,8 +77,7 @@
         {
             "type": "CheckBox",
             "name": "EnableTileDisplay",
-            "caption": "Enable Tile Visualization",
-            "visible": false
+            "caption": "Enable Tile Visualization"
         }
     ],
     "actions": [

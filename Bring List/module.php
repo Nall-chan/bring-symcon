@@ -15,6 +15,7 @@ require_once dirname(__DIR__) . '/libs/BringAPI.php';
  * @property int $ParentID
  * @property array $UserDefinedItems
  * @property array $ListUsers
+ * @property array $List
  * @method void RegisterParent()
  * @method void RegisterAttributeArray(string $name, mixed $Value, int $Size = 0)
  * @method array ReadAttributeArray(string $name)
@@ -46,9 +47,12 @@ class BringList extends IPSModuleStrict
         $this->ParentID = 0;
         $this->UserDefinedItems = [];
         $this->ListUsers = [];
+        $this->List = [
+            'purchase'=> [],
+            'recently'=> []
+        ];
         $this->RegisterAttributeArray(\Bring\Attribute::AllLists, []);
-        $this->RegisterAttributeString(\Bring\Attribute::ListTheme, '');
-
+        $this->RegisterAttributeString(\Bring\Attribute::ListLocale, '');
         $this->RegisterPropertyString(\Bring\Property::ListUuid, '');
         $this->RegisterPropertyInteger(\Bring\Property::RefreshInterval, 0);
         $this->RegisterPropertyInteger(\Bring\Property::AutomaticallySendNotification, 0);
@@ -60,6 +64,11 @@ class BringList extends IPSModuleStrict
 
         $this->RegisterTimer(\Bring\Timer::RefreshList, 0, 'BRING_UpdateList(' . $this->InstanceID . ');');
         $this->RegisterTimer(\Bring\Timer::SendListChangeNotification, 0, 'IPS_RequestAction(' . $this->InstanceID . ',"' . \Bring\Timer::SendListChangeNotification . '",true);');
+
+        $Path = sys_get_temp_dir() . '/SymconBring';
+        if (!is_dir($Path)) {
+            mkdir($Path);
+        }
     }
 
     /**
@@ -78,30 +87,13 @@ class BringList extends IPSModuleStrict
     }
 
     /**
-     * Migrate
-     *
-     * @param  string $JSONData
-     * @return string
-     */
-    /*public function Migrate(string $JSONData): string
-    {
-        $Data = json_decode($JSONData);
-        if ($Data->configuration->{\Bring\Property::AutomaticallySendNotification} == -1)
-        {
-            $Data->configuration->{\Bring\Property::AutomaticallySendNotification} =0;
-            $this->SendDebug('Migrate', json_encode($Data), 0);
-            $this->LogMessage('Migrated settings:' . json_encode($Data), KL_MESSAGE);
-        }
-        return json_encode($Data);
-    }
-     */
-    /**
      * ApplyChanges
      *
      * @return void
      */
     public function ApplyChanges(): void
     {
+        $this->SetTimerInterval(\Bring\Timer::RefreshList, 0);
         //Never delete this line!
         parent::ApplyChanges();
 
@@ -153,7 +145,7 @@ class BringList extends IPSModuleStrict
             $this->UnregisterVariable(\Bring\Variable::UrgentItem);
         }
 
-        $SendNotifyTimeout = $this->ReadPropertyInteger(\Bring\Property::AutomaticallySendNotification);
+        $this->SetVisualizationType((int) $this->ReadPropertyBoolean(\Bring\Property::EnableTileDisplay));
 
         if (IPS_GetKernelRunlevel() != KR_READY) {
             $this->RegisterMessage(0, IPS_KERNELSTARTED);
@@ -163,7 +155,7 @@ class BringList extends IPSModuleStrict
         $this->RegisterParent();
 
         if ($this->HasActiveParent()) {
-            $AllLists = $this->GetLists();
+            $AllLists = @$this->GetLists();
             $this->WriteAttributeArray(\Bring\Attribute::AllLists, $AllLists);
             $Values = [];
             foreach ($AllLists as $List) {
@@ -173,13 +165,18 @@ class BringList extends IPSModuleStrict
                 ];
             }
             $this->UpdateFormField(\Bring\Property::ListUuid, 'options', json_encode($Values));
-            $this->WriteAttributeString(\Bring\Attribute::ListTheme, $this->GetTheme());
-            $this->ListUsers = $this->GetAllUsersFromList();
-            $this->UserDefinedItems = $this->GetListDetail();
-            $this->UpdateList();
-            $this->SetTimerInterval(\Bring\Timer::RefreshList, $this->ReadPropertyInteger(\Bring\Property::RefreshInterval) * 1000);
-        } else {
-            $this->SetTimerInterval(\Bring\Timer::RefreshList, 0);
+            $this->ListUsers = @$this->GetAllUsersFromList();
+            $this->UserDefinedItems = @$this->GetListDetail();
+            $this->List = [
+                'purchase'=> [],
+                'recently'=> []
+            ];
+            if ($this->ReadPropertyString(\Bring\Property::ListUuid)) {
+                @$this->LoadLocal();
+                @$this->UpdateList();
+                $this->SetTimerInterval(\Bring\Timer::RefreshList, $this->ReadPropertyInteger(\Bring\Property::RefreshInterval) * 1000);
+            }
+
         }
     }
 
@@ -228,7 +225,7 @@ class BringList extends IPSModuleStrict
                     $DeleteItem = trim($DeleteItem);
                     $Result = self::DecodeItemString($DeleteItem);
                     if ($Result['itemId']) {
-                        $Result['operation'] = \Bring\Api\BringItemOperation::REMOVE;
+                        $Result['operation'] = \Bring\Api\BringItemOperation::COMPLETE;
                         $Items[] = $Result;
                     }
                 }
@@ -245,7 +242,10 @@ class BringList extends IPSModuleStrict
                         $this->UpdateList();
                         $this->SetTimerInterval(\Bring\Timer::SendListChangeNotification, $this->ReadPropertyInteger(\Bring\Property::AutomaticallySendNotification) * 1000);
                     } else {
-                        echo $this->Translate('Error on change the list');
+                        set_error_handler([$this, 'ModulErrorHandler']);
+                        trigger_error($this->Translate('Error on change the list'), E_USER_WARNING);
+                        restore_error_handler();
+
                     }
                 }
                 break;
@@ -262,7 +262,128 @@ class BringList extends IPSModuleStrict
                 $this->SetTimerInterval(\Bring\Timer::SendListChangeNotification, 0);
                 $this->SendNotify(\Bring\Api\NotificationTypes::CHANGED_LIST);
                 break;
+            case 'purchased':
+                $removeItem = json_decode($Value, true);
+                $Items = $this->List;
+                $Messages = [];
+                foreach ($Items['purchase'] as $Index => $Item) {
+                    if ($Item['name'] == $removeItem['name']) {
+                        if ($this->AddToRecentlyItem($removeItem['name'], $removeItem['specification'])) {
+                            $this->AddVisuUpdateMessage($Messages, 'recently', $Item, '');
+                            $this->UpdateVisualizationValue(json_encode($Messages));
+                            $Items['recently'][] = $Item;
+                            unset($Items['purchase'][$Index]);
+                            $this->List = $Items;
+                            $this->UpdateTextboxVariable();
+                            $this->SetTimerInterval(\Bring\Timer::SendListChangeNotification, $this->ReadPropertyInteger(\Bring\Property::AutomaticallySendNotification) * 1000);
+                        }
+                        return;
+                    }
+                }
+                set_error_handler([$this, 'ModulErrorHandler']);
+                trigger_error($this->Translate('Error on change the list'), E_USER_WARNING);
+                restore_error_handler();
+                break;
+            case 'addItem':
+                $this->SendDebug('Action: ' . $Ident, $Value, 0);
+                $addItem = json_decode($Value, true);
+                $addItem['name'] = ucfirst($addItem['name']);
+                $Items = $this->List;
+                $Messages = [];
+                $FoundIndex = false;
+                $Icon = '';
+                if ($this->AddItem($addItem['name'], $addItem['specification'])) {
+                    foreach ($Items['recently'] as $Index => $Item) {
+                        if ($Item['name'] == $addItem['name']) {
+                            $addItem = array_merge($Item, $addItem);
+                            $FoundIndex = $Index;
+                            break;
+                        }
+                    }
+
+                    if ($FoundIndex) {
+                        unset($Items['recently'][$Index]);
+                    } else {
+                        $this->SendDebug('GetIcon: ' . $Ident, $addItem['name'], 0);
+                        $Icon = $this->GetIcon($addItem['name']);
+                    }
+                    $this->AddVisuUpdateMessage($Messages, 'purchase', $addItem, $Icon);
+                    $this->UpdateVisualizationValue(json_encode($Messages));
+                    $this->SendDebug('addItem', $addItem, 0);
+                    $Items['purchase'][] = $addItem;
+                    $this->List = $Items;
+                    $this->UpdateTextboxVariable();
+                    $this->SetTimerInterval(\Bring\Timer::SendListChangeNotification, $this->ReadPropertyInteger(\Bring\Property::AutomaticallySendNotification) * 1000);
+                    return;
+                }
+                set_error_handler([$this, 'ModulErrorHandler']);
+                trigger_error($this->Translate('Error on change the list'), E_USER_WARNING);
+                restore_error_handler();
+                break;
+            case 'editSpecification':
+                $this->SendDebug('Action: ' . $Ident, $Value, 0);
+                $editItem = json_decode($Value, true);
+                $this->SendDebug('editItem', $editItem, 0);
+                $Items = $this->List;
+                foreach ($Items['purchase'] as &$Item) {
+                    if ($Item['name'] == $editItem['name']) {
+                        if ($this->AddItem($editItem['name'], $editItem['specification'])) {
+                            $Item['specification'] = $editItem['specification'];
+                            $this->List = $Items;
+                            $this->UpdateTextboxVariable();
+                            $this->SetTimerInterval(\Bring\Timer::SendListChangeNotification, $this->ReadPropertyInteger(\Bring\Property::AutomaticallySendNotification) * 1000);
+                        }
+                        return;
+                    }
+                }
+                set_error_handler([$this, 'ModulErrorHandler']);
+                trigger_error($this->Translate('Error on change the list'), E_USER_WARNING);
+                restore_error_handler();
+                break;
+            default:
+                $this->SendDebug('Action: ' . $Ident, $Value, 0);
+                break;
         }
+    }
+
+    public function GetVisualizationTile(): string
+    {
+        $Messages = [];
+        // Get current values and push to message array
+        $List = $this->List;
+        foreach ($List['purchase'] as $Item) {
+            $this->AddVisuUpdateMessage($Messages, 'purchase', $Item, $this->GetIcon($Item['name']));
+        }
+        foreach ($List['recently'] as $Item) {
+            $this->AddVisuUpdateMessage($Messages, 'recently', $Item, $this->GetIcon($Item['name']));
+        }
+        $this->SendDebug(__FUNCTION__, $List, 0);
+
+        // Add static HTML content from file
+        $module = file_get_contents(__DIR__ . '/module.html');
+
+        // Add article database
+        $ListLocale = $this->ReadAttributeString(\Bring\Attribute::ListLocale);
+        $LocalCatalog = [];
+        if ($ListLocale) {
+            $Path = sys_get_temp_dir() . '/SymconBring';
+            $Filename = 'article.' . $ListLocale . '.json';
+            $File = $Path . '/' . $Filename;
+            if (file_exists($File)) {
+                $LocalCatalog = json_decode(file_get_contents($File), true);
+            }
+        }
+        $UserDefinedItems = $this->UserDefinedItems;
+        if (count($UserDefinedItems)) {
+            $UserDefinedItemIdColumn = array_column($UserDefinedItems, 'itemId');
+            $LocalCatalog = array_merge($LocalCatalog, array_combine($UserDefinedItemIdColumn, $UserDefinedItemIdColumn));
+        }
+        $module = str_replace('const localArticles = {}', 'const localArticles = ' . json_encode($LocalCatalog), $module);
+
+        // Inject current values using the message handling function
+        $all = $module . '<script>' . 'handleMessage(\'' . json_encode($Messages) . '\');' . '</script>';
+        $this->SendDebug('TileSize Bytes', strlen($all), 0);
+        return $all;
     }
 
     /**
@@ -276,16 +397,22 @@ class BringList extends IPSModuleStrict
         if (!$Result) {
             return false;
         }
+        $this->List = $Result;
+        $this->SendDebug('LIST', $Result, 0);
 
-        /**
-         * @todo weiter an Funktion für Darstellung der Werte
-         */
-        $Purchase = [];
-        foreach ($Result['purchase'] as $Item) {
-            $Purchase[] = $Item['name'] . ($Item['specification'] ? ' (' . trim($Item['specification']) . ')' : '');
+        $this->UpdateTextboxVariable();
 
+        if ($this->ReadPropertyBoolean(\Bring\Property::EnableTileDisplay)) {
+            $Messages = [];
+            foreach ($Result['purchase'] as $Item) {
+                $this->AddVisuUpdateMessage($Messages, 'purchase', $Item, $this->GetIcon($Item['name']));
+            }
+            foreach ($Result['recently'] as $Item) {
+                $this->AddVisuUpdateMessage($Messages, 'recently', $Item, $this->GetIcon($Item['name']));
+            }
+            $this->SendDebug('Messages', $Messages, 0);
+            $this->UpdateVisualizationValue(json_encode($Messages));
         }
-        $this->SetValue(\Bring\Variable::TextBox, implode("\r\n", $Purchase));
         return true;
     }
 
@@ -300,7 +427,7 @@ class BringList extends IPSModuleStrict
     public function GetList(): array|false
     {
         $JSON = \Bring\Api::GetList($this->ReadPropertyString(\Bring\Property::ListUuid));
-        $Result = @$this->SendDataToParent($JSON);
+        $Result = $this->SendDataToParent($JSON);
         if (!$Result) {
             return false;
         }
@@ -319,7 +446,7 @@ class BringList extends IPSModuleStrict
      */
     public function GetLists(): array
     {
-        $Result = @$this->SendDataToParent(\Bring\Api::GetLists());
+        $Result = $this->SendDataToParent(\Bring\Api::GetLists());
         if (!$Result) {
             return [];
         }
@@ -354,7 +481,7 @@ class BringList extends IPSModuleStrict
      */
     public function GetAllUsersFromList(): array
     {
-        $Result = @$this->SendDataToParent(\Bring\Api::GetAllUsersFromList($this->ReadPropertyString(\Bring\Property::ListUuid)));
+        $Result = $this->SendDataToParent(\Bring\Api::GetAllUsersFromList($this->ReadPropertyString(\Bring\Property::ListUuid)));
         if (!$Result) {
             return [];
         }
@@ -373,9 +500,8 @@ class BringList extends IPSModuleStrict
      */
     public function GetListDetail(): array
     {
-
         $JSON = \Bring\Api::GetListDetail($this->ReadPropertyString(\Bring\Property::ListUuid));
-        $Result = @$this->SendDataToParent($JSON);
+        $Result = $this->SendDataToParent($JSON);
         if (!$Result) {
             return [];
         }
@@ -400,7 +526,7 @@ class BringList extends IPSModuleStrict
             $this->ReadPropertyString(\Bring\Property::ListUuid),
             $NotificationType
         );
-        $Result = @$this->SendDataToParent($JSON);
+        $Result = $this->SendDataToParent($JSON);
         if (!$Result) {
             return false;
         }
@@ -426,7 +552,7 @@ class BringList extends IPSModuleStrict
             \Bring\Api\NotificationTypes::URGENT_MESSAGE,
             $ItemName
         );
-        $Result = @$this->SendDataToParent($JSON);
+        $Result = $this->SendDataToParent($JSON);
         if (!$Result) {
             return false;
         }
@@ -447,12 +573,40 @@ class BringList extends IPSModuleStrict
      */
     public function AddItem(string $ItemName, string $Specification): bool
     {
+        $this->SendDebug(__FUNCTION__, $ItemName, 0);
         $JSON = \Bring\Api::AddItem(
             $this->ReadPropertyString(\Bring\Property::ListUuid),
             $ItemName,
             $Specification
         );
-        $Result = @$this->SendDataToParent($JSON);
+        $Result = $this->SendDataToParent($JSON);
+        if (!$Result) {
+            return false;
+        }
+        $Result = unserialize($Result);
+        if ($Result === false) {
+            return false;
+        }
+        $this->SendDebug(__FUNCTION__, $Result, 0);
+        return true;
+    }
+
+    /**
+     * AddToRecentlyItem
+     *
+     * @param  string $ItemName
+     * @param  string $Specification
+     * @return bool
+     */
+    public function AddToRecentlyItem(string $ItemName, string $Specification): bool
+    {
+        $this->SendDebug(__FUNCTION__, $ItemName, 0);
+        $JSON = \Bring\Api::AddToRecentlyItem(
+            $this->ReadPropertyString(\Bring\Property::ListUuid),
+            $ItemName,
+            $Specification
+        );
+        $Result = $this->SendDataToParent($JSON);
         if (!$Result) {
             return false;
         }
@@ -476,7 +630,7 @@ class BringList extends IPSModuleStrict
             $this->ReadPropertyString(\Bring\Property::ListUuid),
             $ItemName
         );
-        $Result = @$this->SendDataToParent($JSON);
+        $Result = $this->SendDataToParent($JSON);
         if (!$Result) {
             return false;
         }
@@ -538,12 +692,31 @@ class BringList extends IPSModuleStrict
         }
     }
 
+    /**
+     * ModulErrorHandler
+     *
+     * @param  int $errno
+     * @param  string $errstr
+     * @return true
+     */
+    protected function ModulErrorHandler(int $errno, string $errstr): bool
+    {
+        echo $errstr . PHP_EOL;
+        return true;
+    }
+
+    /**
+     * ChangeMultipleItems
+     *
+     * @param  array $Items
+     * @return bool
+     */
     private function ChangeMultipleItems(array $Items): bool
     {
         $this->SendDebug(__FUNCTION__, $Items, 0);
         $JSON = \Bring\Api::ChangeMultipleItems($this->ReadPropertyString(\Bring\Property::ListUuid), $Items);
         $this->SendDebug(__FUNCTION__, $JSON, 0);
-        $Result = @$this->SendDataToParent($JSON);
+        $Result = $this->SendDataToParent($JSON);
         $this->SendDebug(__FUNCTION__, $Result, 0);
         if (!$Result) {
             return false;
@@ -555,11 +728,217 @@ class BringList extends IPSModuleStrict
         return $Result;
     }
 
+    /**
+     * UpdateTextboxVariable
+     *
+     * @return void
+     */
+    private function UpdateTextboxVariable(): void
+    {
+        if (!$this->ReadPropertyBoolean(\Bring\Property::EnableTextboxVariable)) {
+            return;
+        }
+
+        $List = $this->List;
+        $Purchase = [];
+        foreach ($List['purchase'] as $Item) {
+            $Purchase[] = $Item['name'] . ($Item['specification'] ? ' (' . trim($Item['specification']) . ')' : '');
+        }
+        $this->SetValue(\Bring\Variable::TextBox, implode("\r\n", $Purchase));
+    }
+
+    /**
+     * AddVisuUpdateMessage
+     *
+     * @param  array &$Messages
+     * @param  string $Typ
+     * @param  array $Item
+     * @param  string $Icon
+     * @return void
+     */
+    private static function AddVisuUpdateMessage(array &$Messages, string $Typ, array $Item, string $Icon = ''): void
+    {
+        $Item['icon'] = $Icon;
+        $Messages[] =
+          [
+              'ident' => $Typ,
+              'item'  => $Item
+          ];
+
+    }
+    /**
+     * DecodeItemString
+     *
+     * @param  string $Line
+     * @return array
+     */
     private static function DecodeItemString(string $Line): array
     {
         preg_match_all("/(?J)((?<ItemName>.*)\((?<ItemDesc>.*)\))|(?<ItemName>.*)/", $Line, $Result, PREG_SET_ORDER);
         $Item['itemId'] = trim($Result[0]['ItemName']);
         $Item['specification'] = trim($Result[0]['ItemDesc']);
         return $Item;
+    }
+
+    /**
+     * convertIconName
+     *
+     * @param  string $Name
+     * @return string
+     */
+    private static function convertIconName(string $Name): string
+    {
+        return str_replace(['ö', 'ä', 'ü', 'ß'], ['oe', 'ae', 'ue', 'ss'], $Name);
+    }
+
+    /**
+     * LoadLocal
+     *
+     * @return void
+     */
+    private function LoadLocal(): void
+    {
+        $JSON = \Bring\Api::GetUserSettings();
+        $Result = $this->SendDataToParent($JSON);
+        if (!$Result) {
+            return;
+        }
+        $Result = unserialize($Result);
+        if ($Result === false) {
+            return;
+        }
+        $this->SendDebug(__FUNCTION__, $Result, 0);
+        $List = $this->ReadPropertyString(\Bring\Property::ListUuid);
+        foreach ($Result['userlistsettings'] as $ListSetting) {
+            if ($List == $ListSetting[\Bring\Property::ListUuid]) {
+                $UserSetting = $ListSetting['usersettings'];
+                $this->SendDebug(__FUNCTION__ . ' UserSetting', $UserSetting, 0);
+
+                $ListLocale = array_column($UserSetting, 'value', 'key')['listArticleLanguage'];
+                $this->SendDebug(__FUNCTION__ . ' ListLocal', $ListLocale, 0);
+                $Path = sys_get_temp_dir() . '/SymconBring';
+                $Filename = 'article.' . $ListLocal . '.json';
+                $File = $Path . '/' . $Filename;
+                if (($this->ReadAttributeString(\Bring\Attribute::ListLocale) != $ListLocale) || !file_exists($File)) {
+                    $Url = sprintf(\Bring\Api::BringLocalesURL, $ListLocale);
+                    $this->SendDebug(__FUNCTION__ . ' Url', $Url, 0);
+                    $Catalog = @Sys_GetURLContentEx($Url, ['Timeout' => 5000]);
+                    if (!$Catalog) {
+                        return;
+                    }
+                    $this->SendDebug(__FUNCTION__, $Catalog, 0);
+                    file_put_contents($File, $Catalog);
+                    $this->WriteAttributeString(\Bring\Attribute::ListLocale, $ListLocale);
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * TranslateItemNameFromUserLocal
+     *
+     * @param  string $Name
+     * @return string
+     */
+    private function TranslateItemNameFromUserLocal(string $Name, bool &$Found = false): string
+    {
+        $ListLocale = $this->ReadAttributeString(\Bring\Attribute::ListLocale);
+        if (!$ListLocale) {
+            return $Name;
+        }
+
+        $Path = sys_get_temp_dir() . '/SymconBring';
+        $Filename = 'article.' . $ListLocale . '.json';
+        $File = $Path . '/' . $Filename;
+        if (!file_exists($File)) {
+            return $Name;
+        }
+        $LocalCatalog = json_decode(file_get_contents($File), true);
+        $Index = array_search($Name, $LocalCatalog);
+        if ($Index === false) {
+            return $Name;
+        }
+        $Found = true;
+        return $Index;
+    }
+
+    /**
+     * GetIcon
+     *
+     * @param  string $Name
+     * @return string
+     */
+    private function GetIcon(string $Name): string
+    {
+        $UserDefinedItems = $this->UserDefinedItems;
+        $UserDefinedItemIdColumn = array_column($UserDefinedItems, 'itemId');
+        $Index = array_search($Name, $UserDefinedItemIdColumn);
+        if ($Index === false) {
+            $Name = mb_strtolower($this->TranslateItemNameFromUserLocal($Name, $Index));
+        } else {
+            $Name = mb_strtolower($UserDefinedItems[$Index]['userIconItemId']);
+        }
+        $this->SendDebug(__FUNCTION__ . ' Name', $Name, 0);
+        $this->SendDebug(__FUNCTION__, $Index, 0);
+        $Path = sys_get_temp_dir() . '/SymconBring';
+        $Filename = self::convertIconName($Name);
+        $File = $Path . '/' . $Filename . '.png';
+        if (file_exists($File)) {
+            return 'data:image/png;base64,' . base64_encode(file_get_contents($File));
+        }
+        $Icon = '';
+        if ($Index) {
+            $Icon = $this->LoadImage('items/' . $Filename);
+        }
+        if (!$Icon) {
+            $Filename = self::convertIconName(mb_substr($Name, 0, 1));
+            $this->SendDebug(__FUNCTION__, $Filename, 0);
+            $File = $Path . '/' . $Filename . '.png';
+            if (file_exists($File)) {
+                return 'data:image/png;base64,' . base64_encode(file_get_contents($File));
+            }
+            $Icon = $this->LoadImage('items/' . $Filename);
+        }
+        file_put_contents($File, $Icon);
+        return 'data:image/png;base64,' . base64_encode($Icon);
+    }
+
+    /**
+     * LoadImage
+     *
+     * @param  string $Uri
+     * @return string
+     */
+    private function LoadImage(string $Uri): string
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($ch, CURLOPT_URL, \Bring\Api::BringImagesURL . $Uri . '.png');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        //curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 5000);
+        /** @var array $_IPS */
+        $this->SendDebug('RequestURL:' . $_IPS['THREAD'], \Bring\Api::BringImagesURL . $Uri . '.png', 0);
+        $response = curl_exec($ch);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, \Bring\Api::GetWebHeader());
+        curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
+        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+        $response = curl_exec($ch);
+        $HttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($HttpCode != 0) {
+            $this->SendDebug('Request Headers:' . $_IPS['THREAD'], curl_getinfo($ch)['request_header'], 0);
+        }
+        $curl_errno = curl_errno($ch);
+        curl_close($ch);
+        $this->SendDebug('HttpCode:' . $_IPS['THREAD'], $HttpCode, 0);
+        $this->SendDebug('curl_errno:' . $_IPS['THREAD'], $curl_errno, 0);
+        if ($response) {
+            if (strpos($response, '<!') === 0) {
+                $response = '';
+            }
+        }
+        $this->SendDebug('Result:' . $_IPS['THREAD'], $response, 0);
+        return $response ? $response : '';
     }
 }

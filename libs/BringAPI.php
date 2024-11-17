@@ -6,6 +6,8 @@ namespace Bring{
     class Api
     {
         public const BringRestURL = 'https://api.getbring.com/rest/v2/';
+        public const BringImagesURL = 'https://web.getbring.com/assets/images/';
+        public const BringLocalesURL = 'https://web.getbring.com/locale/articles.%s.json';
         public const Login = 'Login';
         public static $CURL_error_codes = [
             0  => 'UNKNOWN ERROR',
@@ -99,6 +101,21 @@ namespace Bring{
                 \Bring\FlowToParent::DataID     => \Bring\GUID::SendToIO,
                 \Bring\FlowToParent::Method     => \Bring\Api\RequestMethod::GET,
                 \Bring\FlowToParent::Url        => 'bringusers/%%%UserUuid%%%/lists',
+                \Bring\FlowToParent::Payload    => []
+            ]);
+        }
+
+        /**
+         * GetUserSettings
+         *
+         * @return string
+         */
+        public static function GetUserSettings(): string
+        {
+            return json_encode([
+                \Bring\FlowToParent::DataID     => \Bring\GUID::SendToIO,
+                \Bring\FlowToParent::Method     => \Bring\Api\RequestMethod::GET,
+                \Bring\FlowToParent::Url        => 'bringusersettings/%%%UserUuid%%%',
                 \Bring\FlowToParent::Payload    => []
             ]);
         }
@@ -234,6 +251,30 @@ namespace Bring{
         }
 
         /**
+         * AddToRecentlyItem
+         *
+         * @param  string $ListUuid
+         * @param  string $ItemName
+         * @param  string $Specification
+         * @return string
+         */
+        public static function AddToRecentlyItem(string $ListUuid, string $ItemName, string $Specification): string
+        {
+            return json_encode([
+                \Bring\FlowToParent::DataID     => \Bring\GUID::SendToIO,
+                \Bring\FlowToParent::Method     => \Bring\Api\RequestMethod::PUT,
+                \Bring\FlowToParent::Url        => 'bringlists/' . $ListUuid,
+                \Bring\FlowToParent::Payload    => [
+                    'purchase'     => '',
+                    'recently'     => $ItemName,
+                    'specification'=> $Specification,
+                    'remove'       => '',
+                    'sender'       => '%%%PublicUserUuid%%%'
+                ]
+            ]);
+        }
+
+        /**
          * GetAllUsersFromList
          *
          * @param  string $ListUuid
@@ -250,9 +291,9 @@ namespace Bring{
         }
 
         /**
-         * GetHeader
+         * GetApiHeader
          *
-         * @return array  Header
+         * @return array Header
          */
         public static function GetApiHeader(): array
         {
@@ -263,7 +304,30 @@ namespace Bring{
             ];
         }
 
+        /**
+         * GetWebHeader
+         *
+         * @return array  Header
+         */
+        public static function GetWebHeader(): array
+        {
+            return [
+                'pragma: no-cache',
+                'cache-control: no-cache',
+                'sec-ch-ua-platform: "Windows"',
+                'sec-ch-ua: "Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"',
+                'sec-ch-ua-mobile: ?0',
+                'accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+                'sec-fetch-site: same-origin',
+                'sec-fetch-mode: no-cors',
+                'sec-fetch-dest: image',
+                'referer: https://web.getbring.com/app/lists/0',
+                'accept-language: de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7',
+                'cookie: bring-terms-notice=1;'
+            ];
+        }
     }
+
     /**
      * GUID
      */
@@ -276,6 +340,7 @@ namespace Bring{
         public const List = '{44D63530-0E14-8B8F-3E1A-A79728240524}';
         public const SendToIO = '{63EFC3AC-198A-DE2F-1770-F98D7E61A5D0}';
     }
+
     /**
      * Property
      */
@@ -291,6 +356,7 @@ namespace Bring{
         public const AutomaticallySendNotification = 'AutomaticallySendNotification';
 
     }
+
     /**
      * Attribute
      */
@@ -305,9 +371,10 @@ namespace Bring{
         public const RefreshToken = 'refresh_token';
         public const AccessTokenExpiresIn = 'expires_in';
         public const UserImage = 'UserImage';
+        public const ListLocale = 'ListLocale';
         public const AllLists = 'AllLists';
-        public const ListTheme = 'ListTheme';
     }
+
     /**
      * Timer
      */
@@ -317,6 +384,7 @@ namespace Bring{
         public const RefreshList = 'RefreshList';
         public const SendListChangeNotification = 'SendListChangeNotification';
     }
+
     /**
      * Variable
      */
@@ -327,6 +395,7 @@ namespace Bring{
         public const Notify = 'Notify';
         public const UrgentItem = 'UrgentItem';
     }
+
     /**
      * FlowToParent
      */
@@ -337,6 +406,7 @@ namespace Bring{
         public const Method = 'Method';
         public const Payload = 'Payload';
     }
+
     /**
      * FlowToWebSocket
      */
@@ -358,6 +428,7 @@ namespace Bring\Api{
         public const POST = 'POST';
         public const PUT = 'PUT';
     }
+
     /**
      * NotificationTypes
      */
@@ -381,50 +452,13 @@ namespace Bring\Api{
     }
 }
 
-namespace Bring{
-    class notused
-    {
-        /**
-         *   Search for an item
-         *
-         *   @param string $search   The item you want to search
-         *   @return json string or html code
-         */
-        public function searchItem($search)
-        {
-            return $this->request(self::GET_REQUEST, 'bringlistitemdetails/', '?listUuid=' . $this->bringListUUID . '&itemId=' . $search);
-        }
-
-        // Hidden Icons? Don't know what this is used for
-        public function loadProducts()
-        {
-            return $this->request(self::GET_REQUEST, 'bringproducts', '');
-        }
-
-        // Found Icons? Don't know what this is used for
-        public function loadFeatures()
-        {
-            return $this->request(self::GET_REQUEST, 'bringusers/' . $this->bringUUID . '/features', '');
-        }
-
-        /**
-         *   Get all users from a shopping list
-         *
-         *   @param string $listUUID   The lisUUID you want to recive a list of users from.
-         *   @return json string or html code
-         */
-        public function getAllUsersFromList($listUUID)
-        {
-            return $this->request(self::GET_REQUEST, 'bringlists/' . $listUUID . '/users', '');
-        }
-
-        /**
-         *   @return json string or html code
-         */
-        public function getUserSettings()
-        {
-            return $this->request(self::GET_REQUEST, 'bringusersettings/' . $this->bringUUID, '');
-        }
-
-    }
-}
+/**
+ * Search for an item
+ * 'bringlistitemdetails/', '?listUuid=' . $this->bringListUUID . '&itemId=' . $search
+ * Hidden Icons? Don't know what this is used for
+ * 'bringproducts'
+ * Found Icons? Don't know what this is used for
+ * 'bringusers/' . $this->bringUUID . '/features'
+ * Get all users from a shopping list
+ * 'bringlists/' . $listUUID . '/users'
+ */

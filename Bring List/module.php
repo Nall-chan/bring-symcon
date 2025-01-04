@@ -216,37 +216,44 @@ class BringList extends IPSModuleStrict
             case \Bring\Variable::TextBox:
                 $OldItems = preg_split('/\r\n|\r|\n/', $this->GetValue(\Bring\Variable::TextBox));
                 $NewItems = preg_split('/\r\n|\r|\n/', $Value);
-                $DeleteItems = array_diff($OldItems, $NewItems);
-                $AddItems = array_diff($NewItems, $OldItems);
-                $this->SendDebug('Add', $AddItems, 0);
-                $this->SendDebug('Delete', $DeleteItems, 0);
-                $Items = [];
-                foreach ($DeleteItems as $DeleteItem) {
-                    $DeleteItem = trim($DeleteItem);
-                    $Result = self::DecodeItemString($DeleteItem);
-                    if ($Result['itemId']) {
-                        $Result['operation'] = \Bring\Api\BringItemOperation::COMPLETE;
-                        $Items[] = $Result;
-                    }
+                $DeleteItems = [];
+                $AddItems = [];
+                foreach (array_diff($OldItems, $NewItems) as $Item) {
+                    $DeleteItems[] = self::DecodeItemString(trim($Item));
                 }
-                foreach ($AddItems as $AddItem) {
-                    $AddItem = trim($AddItem);
-                    $Result = self::DecodeItemString($AddItem);
-                    if ($Result['itemId']) {
-                        $Result['operation'] = \Bring\Api\BringItemOperation::ADD;
-                        $Items[] = $Result;
-                    }
+                foreach (array_diff($NewItems, $OldItems) as $Item) {
+                    $AddItems[] = self::DecodeItemString(trim($Item));
                 }
-                if (count($Items)) {
-                    if ($this->ChangeMultipleItems($Items)) {
-                        $this->UpdateList();
-                        $this->SetTimerInterval(\Bring\Timer::SendListChangeNotification, $this->ReadPropertyInteger(\Bring\Property::AutomaticallySendNotification) * 1000);
-                    } else {
+                $Add = array_diff_key($AddItems, array_intersect(array_column($AddItems, 'itemId'), array_column($DeleteItems, 'itemId')));
+                $Delete = array_diff_key($DeleteItems, array_intersect(array_column($DeleteItems, 'itemId'), array_column($AddItems, 'itemId')));
+                $Change = array_intersect_key($AddItems, array_intersect(array_column($AddItems, 'itemId'), array_column($DeleteItems, 'itemId')));
+                $this->SendDebug('Add', $Add, 0);
+                $this->SendDebug('Delete', $Delete, 0);
+                $this->SendDebug('Change', $Change, 0);
+                foreach ($Delete as &$DeleteItem) {
+                    $DeleteItem['operation'] = \Bring\Api\BringItemOperation::COMPLETE;
+                }
+                foreach ($Add as &$AddItem) {
+                    $AddItem['operation'] = \Bring\Api\BringItemOperation::ADD;
+                }
+                foreach ($Change as $ChangeItem) {
+                    if (!$this->AddItem($ChangeItem['itemId'], $ChangeItem['specification'])) {
                         set_error_handler([$this, 'ModulErrorHandler']);
                         trigger_error($this->Translate('Error on change the list'), E_USER_WARNING);
                         restore_error_handler();
-
                     }
+                }
+                $Items = array_merge($Delete, $Add);
+                if (count($Items)) {
+                    if (!$this->ChangeMultipleItems($Items)) {
+                        set_error_handler([$this, 'ModulErrorHandler']);
+                        trigger_error($this->Translate('Error on change the list'), E_USER_WARNING);
+                        restore_error_handler();
+                    }
+                }
+                if (count($Items) || count($Change)) {
+                    $this->UpdateList();
+                    $this->SetTimerInterval(\Bring\Timer::SendListChangeNotification, $this->ReadPropertyInteger(\Bring\Property::AutomaticallySendNotification) * 1000);
                 }
                 break;
             case \Bring\Variable::Reload:
@@ -704,6 +711,19 @@ class BringList extends IPSModuleStrict
         echo $errstr . PHP_EOL;
         return true;
     }
+    /**
+     * DecodeItemString
+     *
+     * @param  string $Line
+     * @return array
+     */
+    protected static function DecodeItemString(string $Line): array
+    {
+        preg_match_all("/(?J)((?<ItemName>.*)\((?<ItemDesc>.*)\))|(?<ItemName>.*)/", $Line, $Result, PREG_SET_ORDER);
+        $Item['itemId'] = trim($Result[0]['ItemName']);
+        $Item['specification'] = trim($Result[0]['ItemDesc']);
+        return $Item;
+    }
 
     /**
      * ChangeMultipleItems
@@ -766,19 +786,6 @@ class BringList extends IPSModuleStrict
           ];
 
     }
-    /**
-     * DecodeItemString
-     *
-     * @param  string $Line
-     * @return array
-     */
-    private static function DecodeItemString(string $Line): array
-    {
-        preg_match_all("/(?J)((?<ItemName>.*)\((?<ItemDesc>.*)\))|(?<ItemName>.*)/", $Line, $Result, PREG_SET_ORDER);
-        $Item['itemId'] = trim($Result[0]['ItemName']);
-        $Item['specification'] = trim($Result[0]['ItemDesc']);
-        return $Item;
-    }
 
     /**
      * convertIconName
@@ -817,7 +824,7 @@ class BringList extends IPSModuleStrict
                 $ListLocale = array_column($UserSetting, 'value', 'key')['listArticleLanguage'];
                 $this->SendDebug(__FUNCTION__ . ' ListLocal', $ListLocale, 0);
                 $Path = sys_get_temp_dir() . '/SymconBring';
-                $Filename = 'article.' . $ListLocal . '.json';
+                $Filename = 'article.' . $ListLocale . '.json';
                 $File = $Path . '/' . $Filename;
                 if (($this->ReadAttributeString(\Bring\Attribute::ListLocale) != $ListLocale) || !file_exists($File)) {
                     $Url = sprintf(\Bring\Api::BringLocalesURL, $ListLocale);

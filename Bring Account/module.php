@@ -471,9 +471,9 @@ class BringAccount extends IPSModuleStrict
      * http_parse_headers
      *
      * @param  mixed $raw_headers
-     * @return void
+     * @return string
      */
-    private static function http_parse_headers($raw_headers)
+    private static function http_parse_headers(string $raw_headers)
     {
         $headers = [];
         $key = '';

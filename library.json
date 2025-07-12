@@ -4,9 +4,10 @@
     "author": "Michael Tröger",
     "url": "https://github.com/Nall-chan/bring-symcon",
     "compatibility": {
-        "version": "7.1"
+        "version": "8.1",
+        "date":1751981756
     },
-    "version": "1.10",
-    "build": 110,
-    "date": 1736022560
+    "version": "1.11",
+    "build": 111,
+    "date": 1751981756
 }

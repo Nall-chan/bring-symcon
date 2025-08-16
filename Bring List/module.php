@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 eval('declare(strict_types=1);namespace BringList {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/DebugHelper.php') . '}');
 eval('declare(strict_types=1);namespace BringList {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/BufferHelper.php') . '}');
-eval('declare(strict_types=1);namespace BringList {?>' . file_get_contents(__DIR__ . '/../libs/helper/ParentIOHelper.php') . '}');
+eval('declare(strict_types=1);namespace BringList {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/ParentIOHelper.php') . '}');
 eval('declare(strict_types=1);namespace BringList {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/AttributeArrayHelper.php') . '}');
 eval('declare(strict_types=1);namespace BringList {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/VariableProfileHelper.php') . '}');
 require_once dirname(__DIR__) . '/libs/BringAPI.php';
@@ -72,21 +72,6 @@ class BringList extends IPSModuleStrict
     }
 
     /**
-     * Destroy
-     *
-     * @return void
-     */
-    public function Destroy(): void
-    {
-        if (!IPS_InstanceExists($this->InstanceID)) {
-            $this->UnregisterProfile('BRING.Reload');
-            $this->UnregisterProfile('BRING.Notify');
-        }
-        //Never delete this line!
-        parent::Destroy();
-    }
-
-    /**
      * ApplyChanges
      *
      * @return void
@@ -97,49 +82,101 @@ class BringList extends IPSModuleStrict
         //Never delete this line!
         parent::ApplyChanges();
 
-        $this->RegisterProfileIntegerEx(
-            'BRING.Reload',
-            '',
-            '',
-            '',
-            [
-                [0, 'Reload', '', 0xff0000]
-            ]
-        );
-        $this->RegisterProfileStringEx(
-            'BRING.Notify',
-            '',
-            '',
-            '',
-            [
-                [\Bring\Api\NotificationTypes::SHOPPING_DONE, 'Shopping done', '', 0x00ff00],
-                [\Bring\Api\NotificationTypes::GOING_SHOPPING, 'Go shopping', '', 0xff0000],
-                [\Bring\Api\NotificationTypes::CHANGED_LIST, 'List changed', '', 0x0000ff]
-            ]
-        );
+        $this->UnregisterProfile('BRING.Reload');
+        $this->UnregisterProfile('BRING.Notify');
         if ($this->ReadPropertyBoolean(\Bring\Property::EnableTextboxVariable)) {
-            $this->RegisterVariableString(\Bring\Variable::TextBox, $this->Translate('Purchase'), '~TextBox', 1);
+            $this->RegisterVariableString(
+                \Bring\Variable::TextBox,
+                $this->Translate('Purchase'),
+                [
+                    'MULTILINE'    => true,
+                    'PREFIX'       => '',
+                    'PRESENTATION' => VARIABLE_PRESENTATION_VALUE_INPUT,
+                    'SUFFIX'       => '',
+                ],
+                1
+            );
             $this->EnableAction(\Bring\Variable::TextBox);
         } else {
             $this->UnregisterVariable(\Bring\Variable::TextBox);
         }
 
         if ($this->ReadPropertyBoolean(\Bring\Property::EnableRefreshIntegerVariable)) {
-            $this->RegisterVariableInteger(\Bring\Variable::Reload, $this->Translate('Reload List'), 'BRING.Reload', 2);
+            $this->RegisterVariableInteger(
+                \Bring\Variable::Reload,
+                $this->Translate('Reload List'),
+                [
+                    'PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION,
+                    'ICON'         => 'arrows-rotate',
+                    'OPTIONS'      => json_encode(
+                        [
+                            [
+                                'Value'       => 0,
+                                'Caption'     => $this->Translate('Reload'),
+                                'ColorActive' => true,
+                                'Color'       => 0xff0000,
+                                'IconActive'  => false,
+                                'IconValue'   => ''
+                            ]
+                        ]
+                    )
+                ],
+                2
+            );
             $this->EnableAction(\Bring\Variable::Reload);
         } else {
             $this->UnregisterVariable(\Bring\Variable::Reload);
         }
 
         if ($this->ReadPropertyBoolean(\Bring\Property::EnableNotificationIntegerVariable)) {
-            $this->RegisterVariableString(\Bring\Variable::Notify, $this->Translate('Send Notification'), 'BRING.Notify', 3);
+            $this->RegisterVariableString(
+                \Bring\Variable::Notify,
+                $this->Translate('Send Notification'),
+                [
+                    'PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION,
+                    'ICON'         => 'comment-arrow-up-right',
+                    'OPTIONS'      => json_encode(
+                        [
+                            [
+                                'Value'       => \Bring\Api\NotificationTypes::SHOPPING_DONE,
+                                'Caption'     => $this->Translate('Shopping done'),
+                                'Color'       => 0x00ff00,
+                                'IconActive'  => false,
+                                'IconValue'   => ''
+                            ],
+                            [
+                                'Value'       => \Bring\Api\NotificationTypes::GOING_SHOPPING,
+                                'Caption'     => $this->Translate('Go shopping'),
+                                'Color'       => 0xff0000,
+                                'IconActive'  => false,
+                                'IconValue'   => ''
+                            ],
+                            [
+                                'Value'       => \Bring\Api\NotificationTypes::CHANGED_LIST,
+                                'Caption'     => $this->Translate('List changed'),
+                                'Color'       => 0x0000ff,
+                                'IconActive'  => false,
+                                'IconValue'   => ''
+                            ]
+                        ]
+                    )
+                ],
+                3
+            );
             $this->EnableAction(\Bring\Variable::Notify);
         } else {
             $this->UnregisterVariable(\Bring\Variable::Notify);
         }
 
         if ($this->ReadPropertyBoolean(\Bring\Property::EnableNotificationStringVariable)) {
-            $this->RegisterVariableString(\Bring\Variable::UrgentItem, $this->Translate('Send Urgent Item Notification'), '', 4);
+            $this->RegisterVariableString(
+                \Bring\Variable::UrgentItem,
+                $this->Translate('Send Urgent Item Notification'),
+                [
+                    'PRESENTATION' => VARIABLE_PRESENTATION_VALUE_INPUT
+                ],
+                4
+            );
             $this->EnableAction(\Bring\Variable::UrgentItem);
         } else {
             $this->UnregisterVariable(\Bring\Variable::UrgentItem);

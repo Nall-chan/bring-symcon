@@ -44,7 +44,6 @@ class BringAccount extends IPSModuleStrict
         $this->RegisterAttributeInteger(\Bring\Attribute::AccessTokenExpiresIn, 0);
         $this->RegisterAttributeString(\Bring\Attribute::RefreshToken, '');
         $this->RegisterAttributeString(\Bring\Attribute::UserImage, '');
-        //$this->RegisterAttributeString(\Bring\Attribute::UserLocale, '');
         $this->RegisterTimer(\Bring\Timer::RefreshToken, 0, 'IPS_RequestAction(' . $this->InstanceID . ',"' . \Bring\Timer::RefreshToken . '",true);');
     }
 
@@ -165,9 +164,10 @@ class BringAccount extends IPSModuleStrict
                 'caption' => $this->Translate('Logged in user: ') . $this->ReadAttributeString(\Bring\Attribute::Name),
             ];
             $Form['elements'][1] = [
-                'type'  => 'Image',
-                'name'  => 'UserImage',
-                'image' => $this->ReadAttributeString(\Bring\Attribute::UserImage)
+                'type'   => 'Image',
+                'name'   => 'UserImage',
+                'width'  => '200px',
+                'image'  => $this->ReadAttributeString(\Bring\Attribute::UserImage)
             ];
             $Form['actions'][0]['visible'] = true;
             $Form['actions'][1]['visible'] = false;
@@ -294,7 +294,7 @@ class BringAccount extends IPSModuleStrict
      *   @param bool     $IsLogin   True on login command, otherwise false (That is necessary because it sends the API-KEY with the request)
      *   @return array|string|bool  The answer string from the server
      */
-    private function DoRequest(string $RequestMethod = \Bring\Api\RequestMethod::GET, string $RequestURL, array $Payload = [], bool $IsLogin = false): array|string|bool
+    private function DoRequest(string $RequestMethod = \Bring\Api\RequestMethod::GET, string $RequestURL = '', array $Payload = [], bool $IsLogin = false): array|string|bool
     {
         $Parameter = '';
         $ContentType = '';
@@ -473,7 +473,7 @@ class BringAccount extends IPSModuleStrict
      * @param  mixed $raw_headers
      * @return string
      */
-    private static function http_parse_headers(string $raw_headers)
+    private static function http_parse_headers(string $raw_headers): array
     {
         $headers = [];
         $key = '';

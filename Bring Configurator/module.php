@@ -22,7 +22,6 @@ class BringConfigurator extends IPSModuleStrict
     {
         //Never delete this line!
         parent::Create();
-        $this->ConnectParent(\Bring\GUID::Account);
     }
 
     /**

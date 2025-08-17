@@ -251,6 +251,7 @@ class BringList extends IPSModuleStrict
         }
         switch ($Ident) {
             case \Bring\Variable::TextBox:
+                $ListChanged = false;
                 $OldItems = preg_split('/\r\n|\r|\n/', $this->GetValue(\Bring\Variable::TextBox));
                 $NewItems = preg_split('/\r\n|\r|\n/', $Value);
                 $DeleteItems = [];
@@ -267,11 +268,23 @@ class BringList extends IPSModuleStrict
                 $this->SendDebug('Add', $Add, 0);
                 $this->SendDebug('Delete', $Delete, 0);
                 $this->SendDebug('Change', $Change, 0);
-                foreach ($Delete as &$DeleteItem) {
-                    $DeleteItem['operation'] = \Bring\Api\BringItemOperation::COMPLETE;
+                foreach ($Delete as $DeleteItem) {
+                    //$DeleteItem['operation'] = \Bring\Api\BringItemOperation::COMPLETE;
+                    if (!$this->AddToRecentlyItem($DeleteItem['itemId'], $DeleteItem['specification'])) {
+                        set_error_handler([$this, 'ModulErrorHandler']);
+                        trigger_error($this->Translate('Error on change the list'), E_USER_WARNING);
+                        restore_error_handler();
+                    }
+                    $ListChanged = true;
                 }
-                foreach ($Add as &$AddItem) {
-                    $AddItem['operation'] = \Bring\Api\BringItemOperation::ADD;
+                foreach ($Add as $AddItem) {
+                    //$AddItem['operation'] = \Bring\Api\BringItemOperation::ADD;
+                    if (!$this->AddItem($AddItem['itemId'], $AddItem['specification'])) {
+                        set_error_handler([$this, 'ModulErrorHandler']);
+                        trigger_error($this->Translate('Error on change the list'), E_USER_WARNING);
+                        restore_error_handler();
+                    }
+                    $ListChanged = true;
                 }
                 foreach ($Change as $ChangeItem) {
                     if (!$this->AddItem($ChangeItem['itemId'], $ChangeItem['specification'])) {
@@ -279,16 +292,9 @@ class BringList extends IPSModuleStrict
                         trigger_error($this->Translate('Error on change the list'), E_USER_WARNING);
                         restore_error_handler();
                     }
+                    $ListChanged = true;
                 }
-                $Items = array_merge($Delete, $Add);
-                if (count($Items)) {
-                    if (!$this->ChangeMultipleItems($Items)) {
-                        set_error_handler([$this, 'ModulErrorHandler']);
-                        trigger_error($this->Translate('Error on change the list'), E_USER_WARNING);
-                        restore_error_handler();
-                    }
-                }
-                if (count($Items) || count($Change)) {
+                if ($ListChanged) {
                     $this->UpdateList();
                     $this->SetTimerInterval(\Bring\Timer::SendListChangeNotification, $this->ReadPropertyInteger(\Bring\Property::AutomaticallySendNotification) * 1000);
                 }

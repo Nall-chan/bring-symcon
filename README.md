@@ -26,7 +26,7 @@ Einbinden von `Bring!` Einkauflisten in IPS.
 
 ## 1. Voraussetzungen
 
-* IP-Symcon ab Version 7.1
+* IP-Symcon ab Version 8.1
 * Account bei Bring!
  
 ## 2. Software-Installation

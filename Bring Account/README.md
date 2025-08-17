@@ -29,7 +29,7 @@ IO-Modul für einen Bring! Account.
 
 ## 2. Voraussetzungen
 
-* IP-Symcon ab Version 7.1
+* IP-Symcon ab Version 8.1
 
 ## 3. Software-Installation
 

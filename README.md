@@ -31,25 +31,35 @@ Einbinden von `Bring!` Einkauflisten in IPS.
  
 ## 2. Software-Installation
   
-  Über den 'Module-Store' in IPS das Modul `Bring!` hinzufügen.  
-   **Bei kommerzieller Nutzung (z.B. als Errichter oder Integrator) wenden Sie sich bitte an den Autor.**  
+ Über den 'Module-Store' in IPS das Modul `Bring!` hinzufügen.  
+  **Bei kommerzieller Nutzung (z.B. als Errichter oder Integrator) wenden Sie sich bitte an den Autor.**  
+
 ![Module-Store](imgs/install.png) 
 
- Nach der Installation über den Store, wird abgefragt ob ein Konfigurator von diesem Modul automatisch angelegt werden soll.
+Nach der Installation über den Store, wird abgefragt ob ein ([Konfigurator](Bring%20Configurator/README.md)) von diesem Modul automatisch angelegt werden soll.  
 
- Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
+![Module-Store](imgs/install2.png)  
+![Module-Store](imgs/install3.png)  
+
+Dadurch wird automatisch die benötigte [Bring! Account-Instanz (IO)](Bring%20Account/README.md) erstellt.  
+
+![Module-Store](imgs/install4.png)  
+
+Die weitere Konfiguration ist in der [Konfigurator-Instanz](Bring%20Configurator/README.md#4-einrichten-der-instanzen-in-ip-symcon) beschrieben.  
+
+Allgemeine Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
 
 
 
 ## 3. Enthaltende Module
 
-- __Bring Account__ ([Dokumentation](Bring%20Account))  
-	IO-Modul für einen Bring! Account  
+- __Bring Konto__ ([Dokumentation](Bring%20Account/README.md))  
+	IO-Modul für einen Bring! Konto.  
 
-- __Bring Konfigurator__ ([Dokumentation](Bring%20Configurator))  
+- __Bring Konfigurator__ ([Dokumentation](Bring%20Configurator/README.md))  
 	Konfigurator um alle Listen eines Accounts in Symcon anzulegen.  
 
-- __Bring List__ ([Dokumentation](Bring%20List))  
+- __Bring List__ ([Dokumentation](Bring%20List/README.md))  
 	Eine Einkaufliste des Accounts als Instanz in Symcon.  
 
 	

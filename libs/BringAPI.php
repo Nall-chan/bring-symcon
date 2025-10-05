@@ -234,6 +234,7 @@ namespace Bring{
          * @param  string $ItemName
          * @return string
          */
+        /*
         public static function RemoveItem(string $ListUuid, string $ItemName): string
         {
             return json_encode([
@@ -249,6 +250,7 @@ namespace Bring{
                 ]
             ]);
         }
+         */
 
         /**
          * AddToRecentlyItem
@@ -280,6 +282,7 @@ namespace Bring{
          * @param  string $ListUuid
          * @return string
          */
+        /*
         public static function GetAllUsersFromList(string $ListUuid): string
         {
             return json_encode([
@@ -289,6 +292,7 @@ namespace Bring{
                 \Bring\FlowToParent::Payload    => []
             ]);
         }
+        /*
 
         /**
          * GetApiHeader

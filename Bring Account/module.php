@@ -116,7 +116,7 @@ class BringAccount extends IPSModuleStrict
      *
      * @param  string $Username
      * @param  string $Password
-     * @return bool
+     * @return string
      */
     public function SendLogin(string $Username, string $Password): string
     {

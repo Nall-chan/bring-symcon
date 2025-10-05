@@ -46,7 +46,7 @@ class BringList extends IPSModuleStrict
         parent::Create();
         $this->ParentID = 0;
         $this->UserDefinedItems = [];
-        $this->ListUsers = [];
+        //$this->ListUsers = [];
         $this->List = [
             'purchase'=> [],
             'recently'=> []
@@ -202,7 +202,6 @@ class BringList extends IPSModuleStrict
                 ];
             }
             $this->UpdateFormField(\Bring\Property::ListUuid, 'options', json_encode($Values));
-            $this->ListUsers = @$this->GetAllUsersFromList();
             $this->UserDefinedItems = @$this->GetListDetail();
             $this->List = [
                 'purchase'=> [],
@@ -490,80 +489,6 @@ class BringList extends IPSModuleStrict
     }
 
     /**
-     * GetLists
-     *
-     * @return array
-     */
-    public function GetLists(): array
-    {
-        $Result = $this->SendDataToParent(\Bring\Api::GetLists());
-        if (!$Result) {
-            return [];
-        }
-        $Result = unserialize($Result);
-        if ($Result === false) {
-            return [];
-        }
-        $this->SendDebug(__FUNCTION__, $Result, 0);
-        return $Result['lists'];
-    }
-
-    /**
-     * GetTheme
-     *
-     * @return string
-     */
-    public function GetTheme(): string
-    {
-        $Lists = $this->ReadAttributeArray(\Bring\Attribute::AllLists);
-        if (!count($Lists)) {
-            return '';
-        }
-        $Themes = array_column($Lists, 'theme', \Bring\Property::ListUuid);
-        $this->SendDebug(__FUNCTION__, $Themes, 0);
-        return $Themes[$this->ReadPropertyString(\Bring\Property::ListUuid)] ?? '';
-    }
-
-    /**
-     * GetAllUsersFromList
-     *
-     * @return array
-     */
-    public function GetAllUsersFromList(): array
-    {
-        $Result = $this->SendDataToParent(\Bring\Api::GetAllUsersFromList($this->ReadPropertyString(\Bring\Property::ListUuid)));
-        if (!$Result) {
-            return [];
-        }
-        $Result = unserialize($Result);
-        if ($Result === false) {
-            return [];
-        }
-        $this->SendDebug(__FUNCTION__, $Result, 0);
-        return $Result['users'];
-    }
-
-    /**
-     * GetListDetail
-     *
-     * @return array
-     */
-    public function GetListDetail(): array
-    {
-        $JSON = \Bring\Api::GetListDetail($this->ReadPropertyString(\Bring\Property::ListUuid));
-        $Result = $this->SendDataToParent($JSON);
-        if (!$Result) {
-            return [];
-        }
-        $Result = unserialize($Result);
-        if ($Result === false) {
-            return [];
-        }
-        $this->SendDebug(__FUNCTION__, $Result, 0);
-        return $Result;
-    }
-
-    /**
      * SendNotify
      *
      * @param  string $NotificationType
@@ -674,6 +599,7 @@ class BringList extends IPSModuleStrict
      * @param  string $ItemName
      * @return bool
      */
+    /*
     public function RemoveItem(string $ItemName): bool
     {
         $JSON = \Bring\Api::RemoveItem(
@@ -691,6 +617,7 @@ class BringList extends IPSModuleStrict
         $this->SendDebug(__FUNCTION__, $Result, 0);
         return true;
     }
+     */
 
     /**
      * GetConfigurationForm
@@ -766,6 +693,84 @@ class BringList extends IPSModuleStrict
         $Item['itemId'] = trim($Result[0]['ItemName']);
         $Item['specification'] = trim($Result[0]['ItemDesc']);
         return $Item;
+    }
+
+    /**
+     * GetLists
+     *
+     * @return array
+     */
+    private function GetLists(): array
+    {
+        $Result = $this->SendDataToParent(\Bring\Api::GetLists());
+        if (!$Result) {
+            return [];
+        }
+        $Result = unserialize($Result);
+        if ($Result === false) {
+            return [];
+        }
+        $this->SendDebug(__FUNCTION__, $Result, 0);
+        return $Result['lists'];
+    }
+
+    /**
+     * GetTheme
+     *
+     * @return string
+     */
+    /*
+    public function GetTheme(): string
+    {
+        $Lists = $this->ReadAttributeArray(\Bring\Attribute::AllLists);
+        if (!count($Lists)) {
+            return '';
+        }
+        $Themes = array_column($Lists, 'theme', \Bring\Property::ListUuid);
+        $this->SendDebug(__FUNCTION__, $Themes, 0);
+        return $Themes[$this->ReadPropertyString(\Bring\Property::ListUuid)] ?? '';
+    }
+     */
+
+    /**
+     * GetAllUsersFromList
+     *
+     * @return array
+     */
+    /*
+    public function GetAllUsersFromList(): array
+    {
+        $Result = $this->SendDataToParent(\Bring\Api::GetAllUsersFromList($this->ReadPropertyString(\Bring\Property::ListUuid)));
+        if (!$Result) {
+            return [];
+        }
+        $Result = unserialize($Result);
+        if ($Result === false) {
+            return [];
+        }
+        $this->SendDebug(__FUNCTION__, $Result, 0);
+        return $Result['users'];
+    }
+     */
+
+    /**
+     * GetListDetail
+     *
+     * @return array
+     */
+    private function GetListDetail(): array
+    {
+        $JSON = \Bring\Api::GetListDetail($this->ReadPropertyString(\Bring\Property::ListUuid));
+        $Result = $this->SendDataToParent($JSON);
+        if (!$Result) {
+            return [];
+        }
+        $Result = unserialize($Result);
+        if ($Result === false) {
+            return [];
+        }
+        $this->SendDebug(__FUNCTION__, $Result, 0);
+        return $Result;
     }
 
     /**

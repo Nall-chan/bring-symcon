@@ -6,8 +6,8 @@
 [![Run Tests](https://github.com/Nall-chan/bring-symcon/workflows/Run%20Tests/badge.svg)](https://github.com/Nall-chan/bring-symcon/actions)  
 [![Spenden](https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donate_SM.gif)](#2-spenden)[![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](#2-spenden)  
 
-# Bring Account  <!-- omit in toc -->
-IO-Modul für einen Bring! Account.  
+# Bring Konto  <!-- omit in toc -->
+IO-Modul für einen Bring! Konto.  
 
 ## Inhaltsverzeichnis  <!-- omit in toc -->
 
@@ -15,10 +15,11 @@ IO-Modul für einen Bring! Account.
 - [2. Voraussetzungen](#2-voraussetzungen)
 - [3. Software-Installation](#3-software-installation)
 - [4. Einrichten der Instanzen in IP-Symcon](#4-einrichten-der-instanzen-in-ip-symcon)
-- [5. Statusvariablen und Profile](#5-statusvariablen-und-profile)
+- [5. Statusvariablen](#5-statusvariablen)
 - [6. Visualisierung](#6-visualisierung)
 - [7. PHP-Befehlsreferenz](#7-php-befehlsreferenz)
-- [8. Anhang](#8-anhang)
+- [8. Aktionen](#8-aktionen)
+- [9. Anhang](#9-anhang)
   - [1. Changelog](#1-changelog)
   - [2. Spenden](#2-spenden)
 - [10. Lizenz](#10-lizenz)
@@ -37,44 +38,44 @@ IO-Modul für einen Bring! Account.
 
 ## 4. Einrichten der Instanzen in IP-Symcon
 
-### Konfigurationsseite:  <!-- omit in toc -->
+Unter 'Instanz hinzufügen' kann das 'Bring! Konto'-Modul mithilfe des Schnellfilters gefunden werden.
 
-| Name | Beschreibung |
-| ---- | ------------ |
-|      |
-|      |
+![Instanzen](../imgs/inst.png)  
 
-## 5. Statusvariablen und Profile
+Allgemeine Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
 
-Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzelner kann zu Fehlfunktionen führen.
 
-### Statusvariablen  <!-- omit in toc -->
+__Konfigurationsseite:__
 
-| Name | Typ | Beschreibung |
-| ---- | --- | ------------ |
-|      |
-|      |
+Sind keine Zugangsdaten für einen Login vorhanden, erfolgt eine Aufforderung zur Eingabe der Zugangsdaten.  
+Über den Login/Logout Button ist jederzeit eine Änderung der Zugangsdaten möglich.
+![Instanzen](imgs/config1.png) 
 
-### Profile  <!-- omit in toc -->
+## 5. Statusvariablen
 
-| Name | Typ |
-| ---- | --- |
-|      |
-|      |
+Dieses Modul erzeugt keine Statusvariablen.  
 
 ## 6. Visualisierung
 
-Die Funktionalität, die das Modul in der Visualisierung bietet.
+Dieses Modul ist nicht zur Darstellung in einer Visualisierung gedacht.  
 
 ## 7. PHP-Befehlsreferenz
 
-`boolean BRING_BeispielFunktion(integer $InstanzID);`
-Erklärung der Funktion.
+```php
+string BRING_SendLogin(integer $InstanzID, string $Username, string $Password);
+```
+Ermöglicht das Anpassen der Logindaten per PHP-Script.  
 
 Beispiel:
-`BRING_BeispielFunktion(12345);`
+```php
+BRING_SendLogin(12345, 'meine@email.xyz', 'MeinTollesPassword');
+```
 
-## 8. Anhang
+## 8. Aktionen
+
+Keine Aktionen verfügbar.
+
+## 9. Anhang
 
 ### 1. Changelog
 

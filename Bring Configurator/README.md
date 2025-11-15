@@ -1,10 +1,11 @@
 [![SDK](https://img.shields.io/badge/Symcon-PHPModul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.20-blue.svg)]()
-[![Version](https://img.shields.io/badge/Symcon%20Version-8.1%20%3E-green.svg)](https://www.symcon.de/de/service/dokumentation/installation/migrationen/v80-v81-q3-2025/)  
+[![Module Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FNall-chan%2Fbring-symcon%2Frefs%2Fheads%2Fmaster%2Flibrary.json&query=%24.version&label=Modul%20Version&color=blue)]()
+[![Symcon Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FNall-chan%2Fbring-symcon%2Frefs%2Fheads%2Fmaster%2Flibrary.json&query=%24.compatibility.version&suffix=%3E&label=Symcon%20Version&color=green)](https://www.symcon.de/de/service/dokumentation/installation/migrationen/v80-v81-q3-2025/)  
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Check Style](https://github.com/Nall-chan/bring-symcon/workflows/Check%20Style/badge.svg)](https://github.com/Nall-chan/bring-symcon/actions)
 [![Run Tests](https://github.com/Nall-chan/bring-symcon/workflows/Run%20Tests/badge.svg)](https://github.com/Nall-chan/bring-symcon/actions)  
-[![Spenden](https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donate_SM.gif)](#2-spenden)[![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](#2-spenden)  
+[![PayPal.Me](https://img.shields.io/badge/PayPal-Me-lightblue.svg)](#2-spenden)
+[![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](#2-spenden)  
 
 # Bring Configurator  <!-- omit in toc -->
 Konfigurator zum anlegen von Instanzen in Symcon.  
@@ -17,7 +18,7 @@ Konfigurator zum anlegen von Instanzen in Symcon.
 - [4. Einrichten der Instanzen in IP-Symcon](#4-einrichten-der-instanzen-in-ip-symcon)
 - [5. Statusvariablen](#5-statusvariablen)
 - [6. Visualisierung](#6-visualisierung)
-- [7. PHP-Funktionsreferenz](#7-php-funktionsreferenz)
+- [7. PHP-Befehlsreferenz](#7-php-befehlsreferenz)
 - [8. Aktionen](#8-aktionen)
 - [9. Anhang](#9-anhang)
   - [1. Changelog](#1-changelog)
@@ -65,7 +66,7 @@ Dieses Modul erzeugt keine Statusvariablen.
 
 Dieses Modul ist nicht zur Darstellung in einer Visualisierung gedacht.
 
-## 7. PHP-Funktionsreferenz
+## 7. PHP-Befehlsreferenz
 
 Keine Funktionen verfügbar. 
 

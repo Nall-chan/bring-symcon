@@ -1,5 +1,5 @@
 [![SDK](https://img.shields.io/badge/Symcon-PHPModul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Module Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FNall-chan%2Fbring-symcon%2Frefs%2Fheads%2Fmaster%2Flibrary.json&query=%24.version&label=Modul%20Version&color=blue)]()
+[![Module Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FNall-chan%2Fbring-symcon%2Frefs%2Fheads%2Fmaster%2Flibrary.json&query=%24.version&label=Modul%20Version&color=blue)](https://community.symcon.de/t/modul-bring-einkauflisten-in-symcon/139030)
 [![Symcon Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FNall-chan%2Fbring-symcon%2Frefs%2Fheads%2Fmaster%2Flibrary.json&query=%24.compatibility.version&suffix=%3E&label=Symcon%20Version&color=green)](https://www.symcon.de/de/service/dokumentation/installation/migrationen/v80-v81-q3-2025/)  
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Check Style](https://github.com/Nall-chan/bring-symcon/workflows/Check%20Style/badge.svg)](https://github.com/Nall-chan/bring-symcon/actions)
@@ -8,6 +8,7 @@
 [![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](#2-spenden)  
 
 # Bring Konto  <!-- omit in toc -->
+
 IO-Modul für einen Bring! Konto.  
 
 ## Inhaltsverzeichnis  <!-- omit in toc -->
@@ -27,15 +28,15 @@ IO-Modul für einen Bring! Konto.
 
 ## 1. Funktionsumfang
 
-* Datenaustausch mit dem Online-Dienst
+- Datenaustausch mit dem Online-Dienst
 
 ## 2. Voraussetzungen
 
-* IP-Symcon ab Version 8.1
+- IP-Symcon ab Version 8.1
 
 ## 3. Software-Installation
 
-* Dieses Modul ist Bestandteil der [Bring!-Library](../README.md#2-software-installation).  
+- Dieses Modul ist Bestandteil der [Bring!-Library](../README.md#2-software-installation).  
 
 ## 4. Einrichten der Instanzen in IP-Symcon
 
@@ -45,12 +46,11 @@ Unter 'Instanz hinzufügen' kann das 'Bring! Konto'-Modul mithilfe des Schnellfi
 
 Allgemeine Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
 
-
 __Konfigurationsseite:__
 
 Sind keine Zugangsdaten für einen Login vorhanden, erfolgt eine Aufforderung zur Eingabe der Zugangsdaten.  
 Über den Login/Logout Button ist jederzeit eine Änderung der Zugangsdaten möglich.
-![Instanzen](imgs/config1.png) 
+![Instanzen](imgs/config1.png)  
 
 ## 5. Statusvariablen
 
@@ -65,9 +65,11 @@ Dieses Modul ist nicht zur Darstellung in einer Visualisierung gedacht.
 ```php
 string BRING_SendLogin(integer $InstanzID, string $Username, string $Password);
 ```
+
 Ermöglicht das Anpassen der Logindaten per PHP-Script.  
 
-Beispiel:
+Beispiel:  
+
 ```php
 BRING_SendLogin(12345, 'meine@email.xyz', 'MeinTollesPassword');
 ```
@@ -88,7 +90,7 @@ Die Library ist für die nicht kommerzielle Nutzung kostenlos, Schenkungen als U
 
 [![PayPal.Me](https://img.shields.io/badge/PayPal-Me-lightblue.svg)](https://paypal.me/Nall4chan)  
 
-[![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](https://www.amazon.de/hz/wishlist/ls/YU4AI9AQT9F?ref_=wl_share) 
+[![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](https://www.amazon.de/hz/wishlist/ls/YU4AI9AQT9F?ref_=wl_share)
 
 ## 10. Lizenz
 

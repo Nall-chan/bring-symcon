@@ -1,5 +1,5 @@
 [![SDK](https://img.shields.io/badge/Symcon-PHPModul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Module Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FNall-chan%2Fbring-symcon%2Frefs%2Fheads%2Fmaster%2Flibrary.json&query=%24.version&label=Modul%20Version&color=blue)]()
+[![Module Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FNall-chan%2Fbring-symcon%2Frefs%2Fheads%2Fmaster%2Flibrary.json&query=%24.version&label=Modul%20Version&color=blue)](https://community.symcon.de/t/modul-bring-einkauflisten-in-symcon/139030)
 [![Symcon Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FNall-chan%2Fbring-symcon%2Frefs%2Fheads%2Fmaster%2Flibrary.json&query=%24.compatibility.version&suffix=%3E&label=Symcon%20Version&color=green)](https://www.symcon.de/de/service/dokumentation/installation/migrationen/v80-v81-q3-2025/)  
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Check Style](https://github.com/Nall-chan/bring-symcon/workflows/Check%20Style/badge.svg)](https://github.com/Nall-chan/bring-symcon/actions)
@@ -8,6 +8,7 @@
 [![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](#2-spenden)  
 
 # Bring List  <!-- omit in toc -->
+
 Abbilden einer Einkaufliste in Symcon.  
 
 ## Inhaltsverzeichnis<!-- omit in toc -->
@@ -29,17 +30,17 @@ Abbilden einer Einkaufliste in Symcon.
 
 ## 1. Funktionsumfang
 
-* Abbilden einer Bring!-Liste in Symcon
-* Funktionen zum anpassen der Liste  
-* Senden von Bring! Benachrichtigungen
+- Abbilden einer Bring!-Liste in Symcon
+- Funktionen zum anpassen der Liste  
+- Senden von Bring! Benachrichtigungen
 
 ## 2. Voraussetzungen
 
-* IP-Symcon ab Version 8.1
+- IP-Symcon ab Version 8.1
 
 ## 3. Software-Installation
 
-* Dieses Modul ist Bestandteil der [Bring!-Library](../README.md#2-software-installation). 
+- Dieses Modul ist Bestandteil der [Bring!-Library](../README.md#2-software-installation).  
 
 ## 4. Einrichten der Instanzen in IP-Symcon
 
@@ -68,7 +69,7 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 | ---------- | --------------------------------------- | ------ | --------------------------------------------------------- |
 | TextBox    | Kaufen                                  | string | TextBox mit allen Artikeln der Liste.                     |
 | Reload     | Liste neu lade                          | int    | Aktions-Variable für neu laden der Liste.                 |
-| Notify     | Sende Benachrichtigung                  | string    | Senden von einer Bring! Benachrichtigung                  |
+| Notify     | Sende Benachrichtigung                  | string | Senden von einer Bring! Benachrichtigung                  |
 | UrgentItem | Sende dringende Artikelbenachrichtigung | string | Text wird als dringende Artikelbenachrichtigung versendet |
 
 ## 6. Visualisierung
@@ -77,7 +78,7 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 
 ![Kachel](imgs/tile.png)  
 
-![KAchel maximiert](imgs/tile_max.png)  
+![Kachel maximiert](imgs/tile_max.png)  
 
 ### WebFront
 
@@ -88,75 +89,87 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 ```php
 boolean BRING_UpdateList(integer $InstanzID);
 ```
+
 Neu laden der Liste.
 
-Beispiel:
+Beispiel:  
+
 ```php
 BRING_UpdateList(12345);
 ```
 
----
+-------
 
 ```php
 array|false BRING_GetList(integer $InstanzID);
 ```
+
 Liefert alle Einträge einer Liste
 
-Beispiel:
+Beispiel:  
+
 ```php
 print_r(BRING_GetList(12345));
 ```
 
----
+-------
 
 ```php
 boolean BRING_SendNotify(integer $InstanzID, string $NotificationType);
 ```
+
 Sendet eine Bring! Benachrichtigung. Zulässige Werte für `NotificationType` sind:  
 `CHANGED_LIST`, `GOING_SHOPPING`, `SHOPPING_DONE`
 
-Beispiel:
+Beispiel:  
+
 ```php
 BRING_SendNotify(12345, 'SHOPPING_DONE');
 ```
 
----
+-------
 
 ```php
 boolean BRING_SendUrgentItemNotify(integer $InstanzID, string $ItemName);
 ```
+
 Sendet eine Bring! Benachrichtigung vom Typ "dringend benötigt", mit dem Artikel aus `ItemName`.  
 
-Beispiel:
+Beispiel:  
+
 ```php
 BRING_SendUrgentItemNotify(12345, 'Butter');
 ```
 
----
+-------
 
 ```php
 boolean BRING_AddItem(integer $InstanzID, string $ItemName, string $Specification);
 ```
+
 Fügt einen Artikel der Liste hinzu.
 
-Beispiel:
+Beispiel:  
+
 ```php
 BRING_AddItem(12345, 'Gouda', 'Scheiben');
 ```
 
----
+-------
 
 ```php
 boolean BRING_AddToRecentlyItem(integer $InstanzID, string $ItemName, string $Specification);
 ```
+
 Entfernt einen Artikel von der Liste.
 
-Beispiel:
+Beispiel:  
+
 ```php
 BRING_AddToRecentlyItem(12345, 'Gouda', 'Scheiben');
 ```
 
----
+-------
 
 ## 8. Aktionen
 
@@ -174,7 +187,7 @@ Die Library ist für die nicht kommerzielle Nutzung kostenlos, Schenkungen als U
 
 [![PayPal.Me](https://img.shields.io/badge/PayPal-Me-lightblue.svg)](https://paypal.me/Nall4chan)  
 
-[![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](https://www.amazon.de/hz/wishlist/ls/YU4AI9AQT9F?ref_=wl_share) 
+[![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](https://www.amazon.de/hz/wishlist/ls/YU4AI9AQT9F?ref_=wl_share)  
 
 ## 10. Lizenz
 
